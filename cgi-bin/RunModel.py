@@ -1,8 +1,10 @@
-#!C:\Anaconda3\python.exe
+#!/usr/bin/python
 
 import os
 import sys
 import csv
+import matplotlib
+matplotlib.use('Agg')
 from Bioenergetics import *
 import cgi, cgitb
 import pylab
@@ -13,21 +15,21 @@ from scipy.interpolate import griddata
 import pandas
 import seaborn
 cgitb.enable()
-os.chdir(r'C:\xampp\cgi-bin')
 
-def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
-    step_size = Sparam_Range/5
-    Sparam_Range = Sparam_Range*-1
-    for i in range(0,11):
-        Sparam_Exp.append(Sparam_Range)
-        Sparam_Range = Sparam_Range + step_size
-    return Sparam_Exp
+
+
 
 
 form = cgi.FieldStorage()
 # Get data from fields
 
-StartingMass = 60
+Month = form.getvalue('Month1')
+print("Month: %s<br>" % Month)
+Month2 = form.getvalue('Month2')
+TempCurve = form.getvalue('tempCurve')
+StartingMass = form.getvalue('Starting_Mass_In')
+if StartingMass != None:
+    StartingMass=float(StartingMass)
 
 if form.getvalue('defa') == 'yes':
     def_flag = 'YES'
@@ -42,7 +44,6 @@ else:
 if def_flag == 'YES':
     Total_Daphnia = None
     DaphSize = None
-    Month = form.getvalue('Month')
     Light = None
     Year = form.getvalue('Year')
     Site = form.getvalue('Site')
@@ -53,10 +54,15 @@ if def_flag == 'YES':
         Dmax = float(form.getvalue('DmaxIn'))
         Dmin = float(form.getvalue('DminIn'))
 else:
-    Total_Daphnia = float(form.getvalue('Total_Daphnia_Input_Name'))
-    DaphSize  = float(form.getvalue('Daphnia Size'))
-    Light = float(form.getvalue('Light'))
-    Month = form.getvalue('Month')
+    Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
+    if Total_Daphnia != None:
+        Total_Daphnia = float(Total_Daphnia)
+    DaphSize  = form.getvalue('Daphnia Size')
+    if DaphSize != None:
+        DaphSize = float(DaphSize)
+    Light = form.getvalue('Light')
+    if Light != None:
+        Light = float(Light)
     Year = form.getvalue('Year')
     Site = form.getvalue('Site')
     if depr_flag == 'YES':
@@ -72,71 +78,55 @@ print('<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.cs
 print ('<head>')
 print ('<title>Here are Your Results.</title>')
 print ('</head>')
+print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
+<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
+<img class="head" src="/css/src/LPR.jpg">
+<head>
+    <title>GrowChinook</title>
+</head>
+<body>
+    <ul>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
+        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+    </ul>''')
 
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin)
+Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,TempCurve)
 BaseResults,DConsumed  = FreshBatch.Run_Batch()
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 massax = fig.add_subplot(221)
-massax.plot(BaseResults['StartingMass'])
+massax.plot(BaseResults['StartingMass'], label="Mass (g)")
 massax.set_ylabel('Mass (g)')
 grax = fig.add_subplot(222)
 grax.plot(BaseResults['growth'])
 grax.set_ylabel('Growth (g/g/d)')
 dax = fig.add_subplot(223)
-'''
-if def_flag == 'NO':
-    df = pandas.read_csv('%s_%s_%s_temps.csv' % (Site,Month,Year))
-    OldTemps = df.Temperature
-    OldDays = df.Day
-    OldDepths = df.Depth
-    NewTemps = []
-    NewDepths = []
-    NewDays = []
-    for i in range(30):
-        for j in range(len(OldDepths)):
-            if ((OldDepths[j] < Dmax) and (OldDepths[j] > Dmin)):
-                NewDays.append(i)
-                NewDepths.append(OldDepths[j])
-                NewTemps.append(OldTemps[j])
-
-    columns = ["Days", "Depths", "Temperatures"]
-    index = NewDays
-    df_ = pandas.DataFrame(index=index, columns=columns)
-    df_ = df_.fillna(0)
-    df_.Days = NewDays
-    df_.Depths = NewDepths
-    df_.Temperatures = NewTemps
-    df_.to_csv('heatmapdata.csv')
-
-
-
-temps = pandas.read_csv('heatmapdata.csv')
-temps = temps.pivot_table("Temperatures","Depths", "Days")
-x = arange(0.0, 30, 0.01)
-dax =seaborn.heatmap(temps, xticklabels=5, yticklabels=5, vmin = 0, vmax=25, cmap = pyplot.cm.rainbow)
-'''
-dax.plot(BaseResults['day_depth'], 'black')
+dax.plot(BaseResults['day_depth'], 'black', label="Day Depth (m)")
 dax.set_ylabel('Day Depth (m)')
-#dax.set_autoscaley_on(False)
 dax.set_ylim(35,0)
 dax.yticklabels=(arange(0,35,5))
-#dax.fill_between(x, 0, Dmin, color="gray")
-#dax.fill_between(x, 35, Dmax, color="gray")
 nax = fig.add_subplot(224)
-#nax = seaborn.heatmap(temps, xticklabels=10, yticklabels=10, vmin=0, vmax=25, cmap=pyplot.cm.ocean)
 nax.set_ylabel('Night Depth (m)')
-#nax.fill_between(x, Dmin, 0.0, color="gray")
-#nax.fill_between(x, Dmax, 35, color="gray")
-nax.plot(BaseResults['night_depth'],'black')
+nax.plot(BaseResults['night_depth'],'black', label="Night Depth (m)")
 nax.yticklabels=(arange(0,35,5))
 nax.set_ylim(35,0)
 fig.tight_layout(pad=1.08, h_pad=None, w_pad=None, rect=None)
-pylab.savefig( "new.png",facecolor=fig.get_facecolor(), edgecolor='lightblue')
-data_uri = base64.b64encode(open('new.png', 'rb').read()).decode('utf-8').replace('\n', '')
+pid = os.getpid()
+with open(("output_%s.csv" % pid),'wb') as outfile:
+   writer = csv.writer(outfile)
+   writer.writerow(BaseResults.keys())
+   writer.writerows(zip(*BaseResults.values()))
+outfile.close()
+pylab.savefig(("new_%s.png" % pid),facecolor=fig.get_facecolor(), edgecolor='lightblue')
+data_uri = base64.b64encode(open(("new_%s.png" % pid), 'rb').read()).decode('utf-8').replace('\n', '')
 img_tag = '<img class="results" src="data:image/png;base64,{0}">'.format(data_uri)
 print(img_tag)
 
+print('tempcurve: %s<br>' % TempCurve)
 
 print ('''
     <br>
@@ -184,9 +174,72 @@ print ('''  </div>
             </div>
        </div>
        </div><br>
-       ''' % (Month,BaseResults['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
+       ''' % (Month2,BaseResults['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
 
 print('''
+<script>
+window.onload = function(){
+    dlPrompt() {
+    var conf;
+    if (window.confirm("Download Results to CSV?") == true) {
+        conf = "Commencing Download!";
+    } else {
+        conf = "Data is now gone, gone I say!";
+    }
+    document.getElementById("downl").innerHTML = conf;
+}
+</script>
+
+<script type="text/javascript">
+    function configureDropDownLists(ddy,ddm,dds) {
+    var years = ['2013', '2014', '2015'];
+    var months = ['March', 'April', 'May', 'June', 'July', 'August'];
+    var sites = ['Blue River', 'Fall Creek', 'Hills Creek', 'Lookout Point'];
+
+    switch (ddy.value) {
+        case '2013':
+            ddm.options.length = 0;
+            createOption(ddm, months[3], months[3]);
+            createOption(ddm, months[5], months[5]);
+            dds.options.length = 0;
+            for (i=0; i<3; i++) {
+                createOption(dds,sites[i],sites[i]);
+            }
+            break;
+        case '2014':
+            ddm.options.length = 0;
+        for (i = 3; i < months.length; i++) {
+            createOption(ddm, months[i], months[i]);
+            }
+        dds.options.length = 0;
+        for (i=1; i<sites.length; i++) {
+                createOption(dds,sites[i],sites[i]);
+            }
+            break;
+        case '2015':
+            ddm.options.length = 0;
+            for (i = 0; i < months.length; i++) {
+                createOption(ddm, months[i], months[i]);
+            }
+            dds.options.length = 0;
+            for (i=1; i<sites.length; i++) {
+                createOption(dds,sites[i],sites[i]);
+            }
+            break;
+        default:
+            ddm.options.length = 0;
+        break;
+    }
+
+}
+
+    function createOption(dd, text, value) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.text = text;
+        dd.options.add(opt);
+    }
+</script>
 <script>
 function updateDepthTextInput(val) {
           document.getElementById('DMaxInID').value=val;
@@ -220,29 +273,20 @@ function updateLightTextInput(val) {
     <div id="formwrap">
         <form action="RunModel.py" method="post" target="_blank">
             <div id="sec1">
-                <label>Please Select Year:</label> <select name="Year" id="YearID">
-                    <option value="2013" selected>2013</option>
+                <label>Please Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm'),document.getElementById('dds'))">
+                    <option value="2013">2013</option>
                     <option value="2014">2014</option>
                     <option value="2015">2015</option>
                 </select>
                 <br>
                 <br>
 
-                <label>Please Select Site:</label> <select name="Site">
-                    <option value="Fall Creek" selected>Fall Creek</option>
-                    <option value="Hills Creek">Hills Creek</option>
-                    <option value="Lookout Point">Lookout Point</option>
+                <label>Please Select Site:</label> <select name="Site" id="dds">
                 </select>
                 <br>
                 <br>
 
-                <label>Please Select Month:</label> <select name="Month">
-                    <option value="March" selected>March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
+                <label>Please Select Month:</label> <select name="Month" id="ddm">
                 </select>
                 <br>
                 <br>
@@ -250,34 +294,42 @@ function updateLightTextInput(val) {
                 <label>Yes</label><input type="radio" name="defa" value="yes" /><br>
                 <label>No</label><input type="radio" name="defa" value='no' /><br><br>
 
-                <label>Fish Starting Mass (g):</label><input type="range" name="SMassSlide" id="SMassInID" value="60" min="0" max="200" step="0.1" onchange="updateSMassInput(this.value);" oninput="SMassOut.value = SMassSlide.value"><output name="SMassOut" id="SMassOutID">.75</output>
+                <label>Fish Starting Mass (g):</label><input type="range" name="SMassSlide" id="SMassInID" value="60" min="0" max="200" step="0.1" onchange="updateSMassInput(this.value);" oninput="SMassOut.value = SMassSlide.value"><output name="SMassOut" id="SMassOutID">60</output>
                 <label>Or Enter Value:</label> <input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassOutID.value = SMass_TextInID.value"> <br><br>
 
                 <label>Daphnia Size (mm):</label><input type="range" name="DaphSSlide" id="DaphSInID" value=".75" min=".5" max="1.5" step=".01" onchange="updateDaphSText(this.value);" oninput="DaphSOut.value = DaphSSlide.value"><output name="DaphSOut" id="DaphSOutID">.75</output><br><br>
                 <label>Or Enter Value:</label> <input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSOutID.value = DaphSTextInID.value"> <br>
             </div>
             <div id="sec2">
+                
+
                 <label>Total Daphnia:</label><input type="range" name="TotDSlide" id="TotDInID" value="500" min="0" max="1000" onchange="updateTotDTextInput(this.value);" oninput="TotDOut.value = TotDSlide.value"><output name="TotDOut" id="TotDOutID"> 500 </output><br><br>
                 <label>Or Enter Value:</label> <input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDOutID.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br>
 
-                <label>Light Extinction Coefficient:</label><input type="range" name="LightSlide" id="LightInID" value=".3" min="0" max="1" step=".01" onchange="updateLightTextInput(this.value);" oninput="LightOut.value = LightSlide.value"><output name="LightOut" id="LightOutID">.3</output><br><br>
-                <label>Or Enter Value:</label> <input type="text" name="Light" id="LightTextInID" oninput="LightOutID.value = LightTextInID.value" oninput="LightOutID.value = LightInID.value"> <br><br>
+                <label>Light Extinction Coefficient:</label><input type="range" name="LightSlide" id="LightInID" value=".3" min="0" max="1" step=".01" oninput="LightOutID.value = LightInID.value" onchange="updateLightTextInput(this.value);"><output name="LightOut" id="LightOutID">.3</output><br><br>
+                <label>Or Enter Value:</label> <input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
 
-                    <div style="text-align:center;font-size:20px;">Restrict Depth?</div><br>
+                <div style="text-align:center;font-size:20px;">Restrict Depth?</div><br>
                 <label>Yes</label><input type="radio" name="depr" value="yes" /><br>
                 <label>No</label><input type="radio" name="depr" value="no" /><br>
-                <label>Maximum Depth:</label><input type="range" name="DmaxIn" id="DmaxInID" value="60" min="0" max="200" oninput="DmaxOutID.value = DmaxInID.value" onchange="updateDepthTextInput(this.value);"><output name="DmaxOut" id="DmaxOutID"> 60 </output> <br>
-                <label>Minimum Depth:</label><input type="range" name="DminIn" id="DminInID" value="60" min="0" max="200" oninput="DminOutID.value = DminInID.value" onchange="updateDepthTextInput(this.value);"><output name="DminOut" id="DminOutID"> 60 </output> <br>
+		<label>Maximum Depth:</label><input type="range" name="DmaxIn" id="DmaxInID" value="20" min="0" max="35" oninput="DmaxOutID.value = DmaxInID.value" onchange="updateDepthTextInput(this.value);"><output name="DmaxOut" id="DmaxOutID"> 60 </output> <br>
+                <label>Minimum Depth:</label><input type="range" name="DminIn" id="DminInID" value="10" min="0" max="35" oninput="DminOutID.value = DminInID.value" onchange="updateDepthTextInput(this.value);"><output name="DminOut" id="DminOutID"> 60 </output> <br>
                 <label>Or Restrict to a Single Depth:</label> <input type="text" name="Depth_Text" id="Depth_TextInID" oninput="DminIn.value = Depth_Text.value; DmaxIn.value = Depth_Text.value"> <output name="Depth_TextOut" id="Depth_TextOutID"> </output> <br><br>
+
+
+                    
                 <div id="subutt">
-                    <input type="submit" value="Submit"/>
+                    <input type="submit" value="Submit" onclick="dlPrompt()"/>
                 </div>
             </div><br>
         </form>
     </div>
+<p id="downl"></p>
 </body>
 ''')
+print ('</html>')
 
-os.remove('new.png')
+
+os.remove(("new_%s.png" % pid))
 
 quit()

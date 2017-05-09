@@ -13,14 +13,109 @@ from PIL import Image, ImageDraw
 import base64
 from scipy.interpolate import griddata
 import pandas
-import seaborn
 cgitb.enable()
+
+def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,largestout,oldresults,oldresults1):
+    SensOutPer = []
+    SensOutPerD1 = []
+    SensInputs = []
+    month = Month1
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,month,Year)
+
+    if SensParam == 'Starting Mass':
+        Sparam = StartingMass
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,None)
+        results = []
+        BaseResults, DConsumed = FreshBatch.Run_Batch()
+        batches = []
+        for i in range(11):
+            sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
+            if (sensIn > 0.0):
+                SensInputs.append(sensIn)
+            else:
+                SensInputs.append(0.001)
+            batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,None))
+            res, taway = batches[i].Run_Batch()
+            results.append(res)
+            SensOutPer.append(results[i]['growth'][29])
+            SensOutPerD1.append(results[i]['growth'][0])
+
+    elif SensParam == 'Total Daphnia':
+        Sparam = Total_Daphnia
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,None)
+        results = []
+        BaseResults, DConsumed = FreshBatch.Run_Batch()
+        batches = []
+        for z in range(11):
+            sensIn = float(Sparam * (SensFactors[z]/100) + Sparam)
+            if (sensIn > 0.0):    
+                SensInputs.append(sensIn)
+            else:
+                SensInputs.append(0.001)
+            newbatch = Batch(Site, month, Year, Light, DaphSize, SensInputs[z], StartingMass,Dmax,Dmin,None)
+            batches.append(newbatch)
+            res, taway = batches[z].Run_Batch()
+            results.append(res)
+            SensOutPer.append(-100 * ((results[z]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
+            SensOutPerD1.append(100 * ((results[z]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
+
+    elif SensParam == 'Daphnia Size':
+        Sparam = DaphSize
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,None)
+        results = []
+        BaseResults, DConsumed = FreshBatch.Run_Batch()
+        batches = []
+        for i in range(11):
+            sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
+            if (sensIn > 0.0):    
+                SensInputs.append(sensIn)
+            else:
+                SensInputs.append(0.001)
+            batches.append(Batch(Site, month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,None))
+            res, taway = batches[i].Run_Batch()
+            results.append(res)
+            SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
+            SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
+
+    elif SensParam == 'K':
+        Sparam = Light
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,None)
+        results = []
+        BaseResults, DConsumed = FreshBatch.Run_Batch()
+        batches = []
+        for i in range(11):
+            sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
+            if (sensIn > 0.0):    
+                SensInputs.append(sensIn)
+            else:
+                SensInputs.append(0.001)
+            batches.append(Batch(Site, month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,None))
+            res, taway = batches[i].Run_Batch()
+            results.append(res)
+            SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
+            SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))       
+
+    for i in range(len(SensFactors)):
+        if abs(SensFactors[i]) > abs(largestout):
+            largestout = abs(SensFactors[i])
+    for i in range(len(SensOutPer)):
+        if abs(SensOutPer[i]) > abs(largestout):
+            largestout = abs(SensOutPer[i])
+
+    ax.plot(SensFactors, SensOutPer,label=("%s" % month))
+    ax1.plot(SensFactors,SensOutPerD1, label=("%s" % month))
+    '''if oldresults != []:
+        pylab.fill_between(SensFactors,SensOutPer,oldresults,interpolate=True)
+    '''
+    oldresults = SensOutPer
+    oldresults1 = SensOutPerD1
+    return largestout,oldresults,oldresults1
+
 
 form = cgi.FieldStorage()
 # Get data from fields
 
 StartingMass = form.getvalue('Starting_Mass_In')
-TempCurve = form.getvalue('tempCurve')
 if StartingMass != None:
     StartingMass=float(StartingMass)
 else:
@@ -39,13 +134,14 @@ else:
 if def_flag == 'YES':
     Total_Daphnia = None
     DaphSize = None
-    TempCurve = None
-    Month = form.getvalue('Month')
-    Month2 = form.getvalue('Month')
     Light = None
     Year = form.getvalue('Year')
-    Site = form.getvalue('Site')
-
+    if depr_flag == 'NO':
+        Dmax = 50.0
+        Dmin = -1.0
+    else:
+        Dmax = float(form.getvalue('DmaxIn'))
+        Dmin = float(form.getvalue('DminIn'))
 else:
     Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
     if Total_Daphnia != None:
@@ -56,17 +152,14 @@ else:
     Light = form.getvalue('Light')
     if Light != None:
         Light = float(Light)
-    Month = form.getvalue('Month')
-    Month2 = form.getvalue('Month')
     Year = form.getvalue('Year')
-    Site = form.getvalue('Site')
+    if depr_flag == 'YES':
+        Dmax = float(form.getvalue('DmaxIn'))
+        Dmin = float(form.getvalue('DminIn'))
+    else:
+        Dmax = 10000
+        Dmin = -1
 
-if depr_flag == 'YES':
-    Dmax = float(form.getvalue('DmaxIn'))
-    Dmin = float(form.getvalue('DminIn'))
-else:
-    Dmax = 10000
-    Dmin = -1
 
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
 print ('<html>')
@@ -79,120 +172,79 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
 print ('<head>')
 print ('<title>Here are Your Results.</title>')
 print ('</head>')
 
-Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,TempCurve)
-BaseResults,DConsumed  = FreshBatch.Run_Batch()
-
 largestout = 0.0
 batches = []
-results = []
-SensInputs = []
+Years = ['2013','2014','2015']
+Sites2013 = ['Lookout Point', 'Fall Creek', 'Hills Creek']
+Sites2014 = ['Lookout Point', 'Fall Creek', 'Hills Creek']
+Sites2015 = ['Lookout Point', 'Fall Creek', 'Hills Creek']
+Months2013 = ['June','July']
+Months2014 = ['June', 'July', 'August']
+Months2015 = ['March', 'April', 'May', 'June', 'July', 'August']
+AllMonths = [Months2013,Months2014,Months2015]
+
 SensFactors = []
-SensOutPer = []
-SensOutPerD1 = []
-if form.getvalue('Sparam_Range') != None:
-    Sparam_Range = float(form.getvalue('Sparam_Range'))
-else:
-   Sparam_Range = 0.75
+Sparam_Range = 3
 SensParam = form.getvalue('Sens_Param')
 SensFactors = Sensitivity_Expand(Sparam_Range, SensFactors)
 
-if SensParam == 'Starting Mass':
-    Sparam = StartingMass
-    for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) > 0:
-            SensInputs.append(Sparam * SensFactors[i] + Sparam)
-            SensFactors[i] = SensFactors[i] * 100
-            batches.append(Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,TempCurve))
-            results.append(batches[i].Run_Batch())
-            SensOutPer.append(results[i][0]['growth'][29])
-            SensOutPerD1.append(results[i][0]['growth'][0])
-        else:
-            SensInputs.append(None)       
-            batches.append(None)
-            results.append(None)
-            SensOutPer.append(None)
-            SensOutPerD1.append(None)
-
-elif SensParam == 'Total Daphnia':
-    Sparam = Total_Daphnia
-    for i in range(11):
-        SensInputs.append(Sparam * SensFactors[i] + Sparam)
-        SensFactors[i] = SensFactors[i] * 100
-        batches.append(Batch(Site, Month, Year, Light, DaphSize, SensInputs[i], StartingMass,Dmax,Dmin,TempCurve))
-        results.append(batches[i].Run_Batch())
-        SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
-        SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
-
-elif SensParam == 'Daphnia Size':
-    Sparam = DaphSize
-    for i in range(11):
-        SensInputs.append(Sparam * SensFactors[i] + Sparam)
-        SensFactors[i] = SensFactors[i] * 100
-        batches.append(Batch(Site, Month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,TempCurve))
-        results.append(batches[i].Run_Batch())
-        SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
-        SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
-
-elif SensParam == 'K':
-    Sparam = k
-    for i in range(11):
-        SensInputs.append(Sparam * SensFactors[i] + Sparam)
-        SensFactors[i] = SensFactors[i] * 100
-        batches.append(Batch(Site, Month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,TempCurve))
-        results.append(batches[i].Run_Batch())
-        SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
-        SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
-     # "Daphnia eaten",results[0]['dailyconsume'][x])
-for i in range(len(SensFactors)):
-    if SensFactors[i] != None:
-        if abs(SensFactors[i]) > abs(largestout):
-            largestout = abs(SensFactors[i])
-for i in range(len(SensOutPer)):
-    if SensOutPer[i] != None:
-        if abs(SensOutPer[i]) > abs(largestout):
-            largestout = abs(SensOutPer[i])
-if abs(largestout) > 30000:
-    largestout = 30000
-largestoutrem = largestout % 50
-largestout = largestout + 50 - largestoutrem
-fig=pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 ax = fig.add_subplot(122)
-ax.plot(SensFactors, SensOutPer, 'g^')
+
 if SensParam == 'Starting Mass':
     ax.set_ylabel('Final Growth Rate')
 else:
     ax.set_ylabel('Percent Change in Final Growth Rate')
-    ax.axis([-largestout, largestout, -largestout, largestout])
+    ax.axis([-100, 100, -100, 100])
     ax.set_aspect('equal', adjustable='box')
 ax.set_xlabel('Percent Change in %s' % SensParam)
 ax.grid()
 ax1 = fig.add_subplot(121)
-ax1.plot(SensFactors, SensOutPerD1, 'o')
+
 if SensParam == 'Starting Mass':
     ax1.set_ylabel('Final Growth Rate')
 else:
     ax1.set_ylabel('Percent Change in Final Growth Rate')
-    ax1.axis([-largestout, largestout, -largestout, largestout])
+    ax1.axis([-100, 100, -100, 100])
     ax1.set_aspect('equal', adjustable='box')
 ax1.set_xlabel('Percent Change in %s' % SensParam)
 ax1.grid()
+
+oldresults = []
+oldresults1 = []
+Sites = []
+Months = []
+
+for m in (Months2015):        
+    largestout,oldresults,oldresults1 = RunSens('Fall Creek', m, m,'2015', None, None, None, 40, 1000, -1,largestout,oldresults,oldresults1)
+
+legend = ax.legend(loc='upper center', shadow=True)
+# The frame is matplotlib.patches.Rectangle instance surrounding the legend.
+frame = legend.get_frame()
+frame.set_facecolor('0.90')
+
+# Set the fontsize
+for label in legend.get_texts():
+    label.set_fontsize('large')
+
+for label in legend.get_lines():
+    label.set_linewidth(1.5)  # the legend line width
+
 fig.tight_layout(pad=1.08, h_pad=None, w_pad=None, rect=None)
 pylab.savefig( "new.png",facecolor=fig.get_facecolor(), edgecolor='lightblue')
-data_uri = base64.b64encode(open('new.png', 'rb').read()).decode('utf-8').replace('\n', '')
+data_uri = base64.b64encode(open('new.png', 'rb').read()).decode('utf-8').replace('\n', '')    
 img_tag = '<img class="results" src="data:image/png;base64,{0}">'.format(data_uri)
 print(img_tag)
-
-print ('''
+'''
+print (
     <br>
     <div id="valuewraps">
         <div id="datahead">
@@ -212,12 +264,12 @@ print ('''
             <div class="dataleft">%s Light Extinction Coefficient:
                 <div class="dataright">%.2f</div>
             </div>
-       ''' % (FreshBatch.Site,FreshBatch.Year,Month,StartingMass,Month,FreshBatch.TotalDaphnia,Month,FreshBatch.DaphSize,Month,FreshBatch.Light))
-
+        % (FreshBatch.Site,FreshBatch.Year,Month,StartingMass,Month,FreshBatch.TotalDaphnia,Month,FreshBatch.DaphSize,Month,FreshBatch.Light))
+'''
 if depr_flag == "YES":
     print('''Depth restricted to between %.2fm and %.2fm.<br>''' % (Dmin,Dmax))
 
-print ('''  </div>
+'''  </div>
             <div id="outdata">
                 <div class="dataleft">Output Values:</div>
                 <div class="dataleft">%s Final Mass at +%.0f percent:
@@ -241,8 +293,8 @@ print ('''  </div>
             </div>
        </div>
        </div><br>
-       ''' % (Month,SensFactors[10],results[10][0]['StartingMass'][29],Month,SensFactors[10],results[0][0]['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
-
+        % (Month,SensFactors[10],results[10][0]['StartingMass'][29],Month,SensFactors[10],results[0][0]['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
+'''
 print('''
 <script type="text/javascript">
     function configureDropDownLists(ddy,ddm,dds) {

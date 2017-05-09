@@ -7,16 +7,90 @@ from csv import DictReader, QUOTE_NONNUMERIC
 from collections import defaultdict
 from matplotlib import pyplot
 
+def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
+    FallCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
+    HillsCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
+    LookoutPointlength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
+
+    FCk = dict([('March',0.834),('April',0.596),('May',0.58),('June',0.72),('July',0.521),('August',0.509)])
+    HCk = dict([('March',0.583),('April',0.503),('May',0.467),('June',0.441),('July',0.32),('August',0.368)])
+    LPk = dict([('March',0.532),('April',0.565),('May',0.373),('June',0.374),('July',0.396),('August',0.39)])
+    FCk14 = dict([('June',0.404),('July',0.274),('August',0.295)])
+    HCk14 = dict([('June',0.298),('July',0.274),('August',0.274)])
+    LPk14 = dict([('June',0.315),('July',0.271),('August',0.282)])
+    BRk14 = dict([('July',0.254)])
+    FCk13 = dict([('August',0.487)])
+    HCk13 = dict([('August',0.291)])
+    BRk13 = dict([('August',0.263)])
+    #Daphnia totals considering max densities from ALL Sites
+    #Daphnia totals only from C and Z sites
+    FCd = dict([('March',62.83),('April',722.57),('May',1093.27),('June',502.65),('July',201.06),('August',194.78)])
+    HCd = dict([('March',12.57),('April',17.48),('May',578.05),('June',5931.33),('July',414.69),('August',339.29)])
+    LPd = dict([('March',3.14),('April',4.91),('May',578.05),('June',2111.15),('July',703.72),('August',1382.30)])
+    #July 2013 and July 2014 is average of June and August from same year
+    FCd14 = dict([('June',450.13),('July',0),('August',40.72)])
+    HCd14 = dict([('June',262.39),('July',0),('August',13.70)])
+    LPd14 = dict([('June',531.56),('July',0),('August',93.87)])
+    FCd13 = dict([('June',816.81),('July',0),('August',1269.20)])
+    HCd13 = dict([('June',6584.78),('July',0),('August',845.09)])
+    BRd13 = dict([('June',12767.43),('July',0),('August',1671.33)])
+    #Weighted for proportion D. mendotae vs. D. pulex
+    FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
+    HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
+    LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
+    BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
+    #July 2013 and July 2014 is average of June and August from same year
+    FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
+    HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
+    LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
+    BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
+
+    if Light == None and Site =='Fall Creek' and Year == '2015':
+        Light = FCk[Month]
+    elif Light == None and Site =='Hills Creek' and Year == '2015':
+        Light = HCk[Month]
+    elif Light == None and Site  == 'Lookout Point' and Year == '2015':
+        Light = LPk[Month]
+    elif Light == None and Site  =='Fall Creek' and Year == '2014':
+        Light = FCk14[Month]
+    elif Light == None and Site =='Hills Creek' and Year == '2014':
+        Light = HCk14[Month]
+    elif Light == None and Site  == 'Lookout Point' and Year == '2014':
+        Light = LPk14[Month]
+
+    if Total_Daphnia == None and Site  =='Fall Creek':
+        Total_Daphnia = FCd[Month]
+    elif Total_Daphnia == None and Site =='Hills Creek':
+        Total_Daphnia = HCd[Month]
+    elif Total_Daphnia == None and Site  == 'Lookout Point':
+        Total_Daphnia = LPd[Month]
+
+    if DaphSize == None and Site  =='Fall Creek':
+        DaphSize = FCsize[Month]
+    elif DaphSize == None and Site  =='Hills Creek':
+        DaphSize = HCsize[Month]
+    elif DaphSize == None and Site  == 'Lookout Point':
+        DaphSize = LPsize[Month]
+    return Light,Total_Daphnia,DaphSize
+
+def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
+    step_size = Sparam_Range/5
+    Sparam_Range = Sparam_Range*-1
+    for i in range(0,11):
+        Sparam_Exp.append(Sparam_Range)
+        Sparam_Range = Sparam_Range + step_size
+    return Sparam_Exp
 
 
 class Batch:
-    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin):
+    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,TempCurve):
         self.Site = Site
         self.Month = Month
         self.Year = Year
         self.Light = Light
         self.DaphSize = DaphSize
         self.TotalDaphnia = TotalDaphnia
+        self.TempCurve = TempCurve
         self.StartingMass = StartingMass
         self.Dmax = Dmax
         self.Dmin = Dmin
@@ -28,70 +102,6 @@ class Batch:
         self.DayLight = 10000  # lux http://sustainabilityworkshop.autodesk.com/buildings/measuring-light-levels
         self.NightLight = 0.11
         self.out = {}
-
-        FallCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
-        HillsCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
-        LookoutPointlength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
-
-        FCk = dict([('March',0.834),('April',0.596),('May',0.58),('June',0.72),('July',0.521),('August',0.509)])
-        HCk = dict([('March',0.583),('April',0.503),('May',0.467),('June',0.441),('July',0.32),('August',0.368)])
-        LPk = dict([('March',0.532),('April',0.565),('May',0.373),('June',0.374),('July',0.396),('August',0.39)])
-        FCk14 = dict([('June',0.404),('July',0.274),('August',0.295)])
-        HCk14 = dict([('June',0.298),('July',0.274),('August',0.274)])
-        LPk14 = dict([('June',0.315),('July',0.271),('August',0.282)])
-        BRk14 = dict([('July',0.254)])
-        FCk13 = dict([('August',0.487)])
-        HCk13 = dict([('August',0.291)])
-        BRk13 = dict([('August',0.263)])
-        #Daphnia totals considering max densities from ALL Sites
-        #Daphnia totals only from C and Z sites
-        FCd = dict([('March',62.83),('April',722.57),('May',1093.27),('June',502.65),('July',201.06),('August',194.78)])
-        HCd = dict([('March',12.57),('April',17.48),('May',578.05),('June',5931.33),('July',414.69),('August',339.29)])
-        LPd = dict([('March',3.14),('April',4.91),('May',578.05),('June',2111.15),('July',703.72),('August',1382.30)])
-        #July 2013 and July 2014 is average of June and August from same year
-        FCd14 = dict([('June',450.13),('July',0),('August',40.72)])
-        HCd14 = dict([('June',262.39),('July',0),('August',13.70)])
-        LPd14 = dict([('June',531.56),('July',0),('August',93.87)])
-        FCd13 = dict([('June',816.81),('July',0),('August',1269.20)])
-        HCd13 = dict([('June',6584.78),('July',0),('August',845.09)])
-        BRd13 = dict([('June',12767.43),('July',0),('August',1671.33)])
-        #Weighted for proportion D. mendotae vs. D. pulex
-        FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
-        HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
-        LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
-        BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
-        #July 2013 and July 2014 is average of June and August from same year
-        FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
-        HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
-        LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
-        BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
-
-        if self.Light == None and self.Site =='Fall Creek' and self.Year == '2015':
-            self.Light = FCk[Month]
-        elif self.Light == None and self.Site =='Hills Creek' and self.Year == '2015':
-            self.Light = HCk[Month]
-        elif self.Light == None and self.Site  == 'Lookout Point' and self.Year == '2015':
-            self.Light = LPk[Month]
-        elif self.Light == None and self.Site  =='Fall Creek' and self.Year == '2014':
-            self.Light = FCk14[Month]
-        elif self.Light == None and self.Site =='Hills Creek' and self.Year == '2014':
-            self.Light = HCk14[Month]
-        elif self.Light == None and self.Site  == 'Lookout Point' and self.Year == '2014':
-            self.Light = LPk14[Month]
-
-        if self.TotalDaphnia == None and self.Site  =='Fall Creek':
-            self.TotalDaphnia = FCd[Month]
-        elif self.TotalDaphnia == None and self.Site =='Hills Creek':
-            self.TotalDaphnia = HCd[Month]
-        elif self.TotalDaphnia == None and self.Site  == 'Lookout Point':
-            self.TotalDaphnia = LPd[Month]
-
-        if self.DaphSize == None and self.Site  =='Fall Creek':
-            self.DaphSize = FCsize[Month]
-        elif self.DaphSize == None and self.Site  =='Hills Creek':
-            self.DaphSize = HCsize[Month]
-        elif self.DaphSize == None and self.Site  == 'Lookout Point':
-            self.DaphSize = LPsize[Month]
 
         self.DaphWeightdry = (exp(1.468 + 2.83 * log(self.DaphSize))) / 1000000  # Based of Cornell equation (g) #WetDaphWeight <- DaphWeight*(8.7/0.322) #From Ghazy, others use ~10%
         self.DaphWeight = self.DaphWeightdry * 8.7 / 0.322
@@ -113,7 +123,10 @@ class Batch:
         with open(f) as fid:
             reader = DictReader(fid, quoting=QUOTE_NONNUMERIC)
             self.params = next(reader)
-            temperature_file = '{0}_smoothed_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
+            if self.TempCurve == None:
+                temperature_file = '{0}_smoothed_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
+            else:
+                temperature_file = TempCurve
 
         with open(temperature_file) as fid:
             reader = DictReader(fid)
@@ -123,19 +136,12 @@ class Batch:
                 self.Depths.append(float(row['depth']))
 
         self.predatorenergy = self.predatorenergy(self.StartingMass)
-
-
-
-
-
         self.depth_from_temp = interp1d(self.temperatures, self.Depths, fill_value=0, bounds_error=False)
         self.temp_from_depth = interp1d(self.Depths, self.temperatures, fill_value=0, bounds_error=False)
         day_depth = 5
         day_temp = None
         night_depth = 10
         night_temp = None
-
-
         self.day_temp = day_temp or self.temp_from_depth(day_depth)
         self.day_depth = day_depth or self.depth_from_temp(day_temp)
         self.night_temp = night_temp or self.temp_from_depth(night_depth)
@@ -311,6 +317,12 @@ class Batch:
         return (consumptionjoules - ((egestion + excretion + SDAction) * inner(prey, preyenergy) + respiration * self.O2Conv)) / predatorenergy * W
 
     def best_depth(self, StartingLength,StartingMass,hours,light, depths):
+        if self.Dmin > min(max(depths),self.Dmax):
+            self.Dmin = min(max(depths),self.Dmax)
+        if self.Dmax < max(min(depths),self.Dmin):
+            self.Dmax = max(min(depths),self.Dmin)
+        if self.Dmax == self.Dmin:
+            self.Dmax = self.Dmax + 0.2
         depth_arr = arange(max(min(depths),self.Dmin),min(max(depths),self.Dmax),0.1)
         growths = [self.growth_fn(d,StartingLength,StartingMass,hours,light,self.prey)[0] for d in depth_arr]
         idx = argmax(growths)
