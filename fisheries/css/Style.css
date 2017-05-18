@@ -1,0 +1,141 @@
+#formwrap {
+    margin: auto;
+    background-color: #c8e9b1;
+    width: 80%;
+    overflow: hidden;
+    border: solid #88a56e;
+    border-width: 3px;
+}
+
+#valuewrap {
+    margin: auto;
+    background-color: #c8e9b1;
+    width: 80%;
+    height: 30%;
+    overflow: hidden;
+    border: solid #88a56e;
+    border-width: 3px;
+}
+
+#sec1 {
+    background-color: #c8e9b1;
+    width: 50%;
+    float:left;
+
+}
+
+#sec2 {
+    background-color: #c8e9b1;
+    width:50%;
+    float:right;
+}
+
+#subutt {
+    align: center;
+    text-align: center;
+    width: 50%
+}
+
+body {
+    color: #000000;
+    background: #dcf0d6 none no-repeat scroll center center;
+}
+
+img.head {
+    width: 90%;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    border: solid #88a56e;
+    border-width: 3px;
+}
+
+img.results {
+    width: 50%;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    border: solid #88a56e;
+    border-width: 3px;
+}
+
+form {
+    background-color: #c8e9b1;
+    display: block;
+    width: 95%;
+    margin: 0 auto;
+}
+
+h2 {color: #552E00;
+    font: 30px;
+    float: center;
+    text-align: center;
+}
+
+label, input {
+    display: inline-block;
+}
+input{
+    width: 30%;
+    text-align: left;
+    float: center;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
+
+output{
+    display: inline-block
+    width: 10%
+    text-align: left;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+    }
+
+#indata {
+    height:80%;
+    width:48%;
+    vertical-align:bottom;
+    float:left;
+    background-color:#c8e9b1;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
+
+#outdata{
+    height:80%;
+    width:48%;
+    float: right;
+    vertical-align:bottom;
+    background-color:#c8e9b1;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
+
+#datahead{
+    height:20%;
+    width:100%;
+    vertical-align:top;
+    font-size:20px;
+    text-align:center;
+}
+
+div.dataleft{
+    width:75%;
+    left-margin:0%;
+    vertical-align:bottom;
+}
+
+div.dataright{
+    float: right;
+    width:25%;
+    left-margin:0%;
+    vertical-align:bottom;
+}
+
+div.inside {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+label {
+    width: 45%;
+    text-align: right;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
