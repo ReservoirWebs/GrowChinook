@@ -18,6 +18,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Fall Creek,June,12,1,200
 2015,Fall Creek,June,14,1,200
 2015,Fall Creek,June,20,0,0
+2015,Fall Creek,June,35,0,0
 2015,Fall Creek,July,0.5,3,600
 2015,Fall Creek,July,2,5,1000
 2015,Fall Creek,July,4,24,4800
@@ -38,6 +39,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Fall Creek,August,14,1,200
 2015,Fall Creek,August,20,0,0
 2015,Fall Creek,August,28,2,400
+2015,Fall Creek,August,35,0,0
 2015,Hills Creek,May,0.5,2,400
 2015,Hills Creek,May,2,15,3000
 2015,Hills Creek,May,4,15,3000
@@ -88,6 +90,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Lookout Point,May,14,0,0
 2015,Lookout Point,May,20,1,200
 2015,Lookout Point,May,27,1,200
+2015,Lookout Point,May,35,0,0
 2015,Lookout Point,June,0.5,1,200
 2015,Lookout Point,June,2,13,2600
 2015,Lookout Point,June,4,24,4800
@@ -128,6 +131,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Fall Creek,March,14,4,800
 2015,Fall Creek,March,20,1,200
 2015,Fall Creek,March,33,1,200
+2015,Fall Creek,March,35,0,0
 2015,Fall Creek,April,0.5,6,1200
 2015,Fall Creek,April,2,64,12800
 2015,Fall Creek,April,4,28,5600
@@ -138,6 +142,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Fall Creek,April,14,4,800
 2015,Fall Creek,April,20,1,200
 2015,Fall Creek,April,33,1,200
+2015,Fall Creek,April,35,0,0
 2015,Hills Creek,March,0.5,2,400
 2015,Hills Creek,March,2,15,3000
 2015,Hills Creek,March,4,15,3000
@@ -168,6 +173,7 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Lookout Point,March,14,0,0
 2015,Lookout Point,March,20,1,200
 2015,Lookout Point,March,27,1,200
+2016,Lookout Point,March,35,0,0
 2015,Lookout Point,April,0.5,12,2400
 2015,Lookout Point,April,2,7,1400
 2015,Lookout Point,April,4,21,4200
@@ -178,3 +184,4 @@ Year,Site,Month,Depth,Total Daphnia,Sum of Density
 2015,Lookout Point,April,14,0,0
 2015,Lookout Point,April,20,1,200
 2015,Lookout Point,April,27,1,200
+2015,Lookout Point,April,35,0,0
