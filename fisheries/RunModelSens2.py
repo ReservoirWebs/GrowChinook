@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os
+import os, time
 import matplotlib
 matplotlib.use('Agg')
 import sys
@@ -18,7 +18,16 @@ import pandas
 cgitb.enable()
 Scruffy()
 
-def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,largestout,oldresults,oldresults1):
+address = cgi.escape(os.environ["REMOTE_ADDR"])
+script = "Advanced Sensitivity Run Page"
+with open('userlog.csv', 'a') as log:
+    log.write("IP: {}," .format(address))
+    log.write("Page: {}," .format(script))
+    log.write("Time: {}," .format(time.ctime(time.time())))
+    log.write('\n')
+log.closed
+
+def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,largestout,oldresults,oldresults1):
     SensOutPer = []
     SensOutPerD1 = []
     SensInputs = []
@@ -228,7 +237,8 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
 print ('<head>')
 print ('<title>Here are Your Results.</title>')
@@ -329,15 +339,31 @@ oldresults1 = []
 Sites = []
 Months = []
 csvheaders=[[] for i in range(11)]
-if Year == '2015':
-    for m in (Months2015):
-        largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
-elif Year == '2014':
-    for m in (Months2014):
-        largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
-elif Year == '2013':
-    for m in (Months2013):
-        largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
+try:
+    if Year == '2015':
+        for m in (Months2015):
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,largestout,oldresults,oldresults1)
+    elif Year == '2014':
+        for m in (Months2014):
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
+    elif Year == '2013':
+        for m in (Months2013):
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
+except:
+    print 'Content-Type: text/html'
+    print 'Location: http://cas-web0.biossys.oregonstate.edu/error.html'
+    print # HTTP says you have to have a blank line between headers and content
+    print '<html>'
+    print '  <head>'
+    print '    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />'
+    print '    <title>You are going to be redirected</title>'
+    print '  </head>' 
+    print '  <body>'
+    print '    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>'
+    print '  </body>'
+    print '</html>'
+    cgitb.handler()
+
 #if SensParam == 'Total Daphnia':
 #    for m in (Months2015):        
 #        largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, None, None, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
@@ -409,13 +435,18 @@ if depr_flag == "YES":
        </div><br>
         % (Month,SensFactors[10],results[10][0]['StartingMass'][29],Month,SensFactors[10],results[0][0]['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
 '''
+
+print('''<div style="display:block; margin-left:auto; margin-right:auto;">Download Full Results?
+                <a href="/cgi-bin/{}" download>Download</a>
+            </div>
+'''.format(fname))
+
 print('''
 <script type="text/javascript">
     function configureDropDownLists(ddy,ddm,dds) {
     var years = ['2013', '2014', '2015'];
     var months = ['March', 'April', 'May', 'June', 'July', 'August'];
     var sites = ['Blue River', 'Fall Creek', 'Hills Creek', 'Lookout Point'];
-
     switch (ddy.value) {
         case '2013':
             ddm.options.length = 0;
@@ -450,9 +481,7 @@ print('''
             ddm.options.length = 0;
         break;
     }
-
 }
-
     function createOption(dd, text, value) {
         var opt = document.createElement('option');
         opt.value = value;
@@ -489,69 +518,78 @@ function updateLightTextInput(val) {
         }
 </script>
 <body>
-    <div style="display:block; margin-left:auto; margin-right:auto;">Download Full Results?
-                <a href="/cgi-bin/%s" download>Download</a>
-            </div>
+    
     <h2>Enter Values to GrowChinook</h2>
     <div id="formwrap">
         <form action="RunModelSens2.py" method="post" target="_blank">
-        <div style="display:inline-block;width:1100px;">
-                    <div style="font-size:20px;width:1000px;margin:auto;"><label style="margin:auto;width:600px;">Select Sensitivity Parameter:</label><select name="Sens_Param" style="width:150px"><br>
+
+        <div style="display:inline-block;width:90%;">
+                    <div style="font-size:20px;width:45%;float:left;margin:auto;">First Select Sensitivity Parameter:<select name="Sens_Param"><br>
                         <option value="Starting Mass" selected>Starting Mass</option>
                         <option value="Total Daphnia">Total Daphnia</option>
-                        <option value="Daphnia Size">Daphnia </option>
+                        <option value="Daphnia Size">Daphnia Size</option>
                         <option value="K">Light</option>
-                    </select><br>
-                    <label style="width:500px;">Select Sensitivity Range(percent)</label><input type="range" name="SensSlide" id="SensInID" value="100" min="0" max="500" step="1" onchange="updateSensText(this.value);" oninput="SensOut.value = SensSlide.value"><output name="SensOut" id="SensOutID">100</output><br><br>
-                    <label>Or Enter Value:</label> <input type="text" name="Sparam_Range" id="SensTextInID" oninput="SensOutID.value = SensTextInID.value"> <br>
-
+                    </select>
                     </div>
-                    <div style="width:300px;"></div>
-                    <br>
+
+                    <div style="width:45%;float:right;">
+                    <label>Enter Value for Sensitivity Range (Percent):</label> <input type="text" name="Sparam_Range" id="SensTextInID" oninput="SensOutID.value = SensTextInID.value"></div> <br>
+                    <br><br><br>
 </div>
-	<div id="sec1">
-                <label>Please Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm'),document.getElementById('dds'))">
-                    <option value=""></option>
-                    <option value="2015">2015</option>
-                    <option value="2014">2014</option>
-                    <option value="2013">2013</option>
-                </select>
-                <br>
-                <br>
-                    <div style="text-align:center;font-size:20px;">Use Default Values? </div><br>
-                <label>Yes</label><input type="radio" name="defa" value="yes" /><br>
-                <label>No</label><input type="radio" name="defa" value='no' /><br><br>
+ <br><b>Enter a Starting Mass for the fish. Then Select a Year and Site. The model will run sensitivity analysis of all months available for the selected Year and Month.</b>
 
-                <label>Fish Starting Mass (g):</label><input type="range" name="SMassSlide" id="SMassInID" value="60" min="0" max="200" step="0.1" onchange="updateSMassInput(this.value);" oninput="SMassOut.value = SMassSlide.value"><output name="SMassOut" id="SMassOutID">60</output>
-                <label>Or Enter Value:</label> <input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassOutID.value = SMass_TextInID.value"> <br><br>
+           <div id="sec1" style="display:inline-block;">
+                <div>
+                    <label>Enter Fish Starting Mass (g):</label><input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassSlide.value = SMass_TextInID.value">
+                </div>
+                <div style="text-align:center;width:80%;"><b>Select a Year and Site to run analysis for.</b></div>
+                <div style="margin:auto;display:inline-block;float:left;width:100%;">
+                    <div style="width:45%;float:left;">
+                    <label>Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists2(this,document.getElementById('dds'))">
+                        <option value=""></option>
+                        
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        </select>
+                    </div>
+                    <div style="width:45%;float:right;">
+                        <label>Select Site:</label> <select name="Site" id="dds">
+                        </select>
+                    </div>
 
-                <label>Daphnia Size (mm):</label><input type="range" name="DaphSSlide" id="DaphSInID" value=".75" min=".5" max="1.5" step=".01" onchange="updateDaphSText(this.value);" oninput="DaphSOut.value = DaphSSlide.value"><output name="DaphSOut" id="DaphSOutID">.75</output><br><br>
-                <label>Or Enter Value:</label> <input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSOutID.value = DaphSTextInID.value"> <br>
+
+
+                <div><br><br><label>Daphnia Density (per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
+                <label>Light Extinction Coefficient</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
+                <label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
+                </div>
+                </div>
+
 
             </div>
             <div id="sec2">
-                <label>Total Daphnia:</label><input type="range" name="TotDSlide" id="TotDInID" value="500" min="0" max="1000" onchange="updateTotDTextInput(this.value);" oninput="TotDOut.value = TotDSlide.value"><output name="TotDOut" id="TotDOutID"> 500 </output><br><br>
-                <label>Or Enter Value:</label> <input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDOutID.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br>
+                <br>
+                <div style="display:inline-block;">
+                <div class="deptem" style="float:left;width:30%;"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
+                <div style="float:right;width:70%;">
+		        <label class="deptem">Maximum Temperature:</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
+                <label class="deptem">Minimum Temperature:</label><input class="deptem" type="text" name="TminIn" id="TminInID">
+                </div>
+                </div>
+                <div><br></div>
+                <div class="deptem" style="float:left;width:30%;"><p style="margin-top:auto;"><b>Optional: Set to restrict depth</b></div>
+                <div style="float:right;width:70%;">
+		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
+                <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
+                </div>
 
-                <label>Light Extinction Coefficient:</label><input type="range" name="LightSlide" id="LightInID" value=".3" min="0" max="1" step=".01" oninput="LightOutID.value = LightInID.value" onchange="updateLightTextInput(this.value);"><output name="LightOut" id="LightOutID">.3</output><br><br>
-                <label>Or Enter Value:</label> <input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
-
-
-<div style="text-align:center;font-size:20px;">Restrict Depth?</div><br>
-                <label>Yes</label><input type="radio" name="depr" value="yes" /><br>
-                <label>No</label><input type="radio" name="depr" value="no" /><br>
-		<label>Maximum Depth:</label><input type="range" name="DmaxIn" id="DmaxInID" value="20" min="0" max="35" oninput="DmaxOutID.value = DmaxInID.value" onchange="updateDepthTextInput(this.value);"><output name="DmaxOut" id="DmaxOutID"> 20 </output> <br>
-                <label>Minimum Depth:</label><input type="range" name="DminIn" id="DminInID" value="10" min="0" max="35" oninput="DminOutID.value = DminInID.value" onchange="updateDepthTextInput(this.value);"><output name="DminOut" id="DminOutID"> 10 </output> <br>
-                <label>Or Restrict to a Single Depth:</label> <input type="text" name="Depth_Text" id="Depth_TextInID" oninput="DminIn.value = Depth_Text.value; DmaxIn.value = Depth_Text.value"> <output name="Depth_TextOut" id="Depth_TextOutID"> </output> <br><br>
-
-            </div>
               		    <div id="subutt">
                         <input type="submit" value="Submit"/>
                     </div>
         </form>
     </div>
 </body>
-''' % fname)
+''')
 
 os.remove('new.png')
 quit()

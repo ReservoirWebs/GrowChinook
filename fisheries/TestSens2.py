@@ -1,8 +1,17 @@
 #!/usr/bin/python
 
 
-import cgi, cgitb
+import cgi, cgitb,time, os
 cgitb.enable()
+
+address = cgi.escape(os.environ["REMOTE_ADDR"])
+script = "Advanced Sensitivity Form"
+with open('userlog.csv', 'a') as log:
+    log.write("IP: {}," .format(address))
+    log.write("Page: {}," .format(script))
+    log.write("Time: {}," .format(time.ctime(time.time())))
+    log.write('\n')
+log.closed
 
 print ('Content-type:text/html\r\n\r\n')
 print('<html>')
@@ -92,6 +101,7 @@ function updateLightTextInput(val) {
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>
 <body>
@@ -123,7 +133,7 @@ function updateLightTextInput(val) {
                     <div style="width:45%;float:left;">
                     <label>Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists2(this,document.getElementById('dds'))">
                         <option value=""></option>
-                        <option value="2013">2013</option>
+                        
                         <option value="2014">2014</option>
                         <option value="2015">2015</option>
                         </select>
@@ -146,7 +156,7 @@ function updateLightTextInput(val) {
             <div id="sec2">
                 <br>
                 <div style="display:inline-block;">
-                <div class="deptem" style="float:left;width:30%"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
+                <div class="deptem" style="float:left;width:30%;"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
                 <div style="float:right;width:70%;">
 		        <label class="deptem">Maximum Temperature:</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
                 <label class="deptem">Minimum Temperature:</label><input class="deptem" type="text" name="TminIn" id="TminInID">

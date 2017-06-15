@@ -30,42 +30,6 @@ title=form.getvalue('TabName')
 if title == None:
     title="GrowChinook Results"
 
-TempCurve = form.getvalue('tempCurve')
-StartingMass = form.getvalue('Starting_Mass_In')
-if StartingMass != None:
-    StartingMass=float(StartingMass)
-else:
-    StartingMass = 40
-
-if (form.getvalue('DmaxIn') == None) and (form.getvalue('DminIn') == None):
-    depr_flag = 'NO'
-else:
-    depr_flag = 'YES'
-
-if (form.getvalue('TmaxIn') == None) and (form.getvalue('TminIn') == None):
-    tempr_flag = 'NO'
-else:
-    tempr_flag = 'YES'
-
-
-Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
-if Total_Daphnia == None:
-    if form.getvalue('TotDDef') != None:
-        Total_Daphnia = form.getvalue('TotDDef')
-else:
-    Total_Daphnia = float(Total_Daphnia)
-DaphSize  = form.getvalue('Daphnia Size')
-if DaphSize == None:
-    if form.getvalue('DaphSDef') != None:
-        DaphSize = form.getvalue('DaphSDef')
-else:
-    DaphSize = float(DaphSize)
-Light = form.getvalue('Light')
-if Light == None:
-    if form.getvalue('LightDef') != None:
-        Light = form.getvalue('LightDef')
-else:
-    Light = float(Light)
 Year = form.getvalue('Year')
 if Year == None:
     Year = "2015"
@@ -76,53 +40,27 @@ Site = form.getvalue('Site')
 if Site == None:
     Site = "Fall Creek"
 
-if depr_flag == 'YES':
-    if form.getvalue('DmaxIn') != None:
-        Dmax = float(form.getvalue('DmaxIn'))
-    else:
-        Dmax = 10000
-    if form.getvalue('DminIn') != None:
-        Dmin = float(form.getvalue('DminIn'))
-    else:
-        Dmin = -1
+Scenario=form.getvalue('Scene')
+if Scenario == 'WSBDD':
+    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Fall Creek', form.getvalue('Month1'), form.getvalue('Year'))
+    Light = None
+    Total_Daphnia = None
+    DaphSize = None
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,'Fall Creek',Month,Year)
+    Total_Daphnia = None
+    DaphSize = None
 else:
-    Dmin,Dmax = -1,1000
+    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('Site'), form.getvalue('Month'), form.getvalue('Year'))
 
-if tempr_flag == 'YES':
-    if form.getvalue('TmaxIn') != None:
-        Tmax = float(form.getvalue('TmaxIn'))
-    else:
-        Tmax = 10000
-    if form.getvalue('TminIn') != None:
-        Tmin = float(form.getvalue('TminIn'))
-    else:
-        Tmin = -1
-    if Tmin==Tmax:
-        Tmax = Tmax+1
+StartingMass = form.getvalue('Starting_Mass_In')
+if StartingMass != None:
+    StartingMass=float(StartingMass)
 else:
-    Tmin,Tmax = -1,1000
-    
+    StartingMass = 40
 
 
-DYear = form.getvalue('DYear')
-if DYear == None:
-    DYear = Year
-DMonth = form.getvalue('DMonth')
-if DMonth == None:
-    DMonth = Month
-DSite = form.getvalue('DSite')
-if DSite == None:
-    DSite = Site
-TYear = form.getvalue('TYear')
-if TYear == None:
-    TYear = Year
-TMonth = form.getvalue('TMonth')
-if TMonth == None:
-    TMonth = Month
-TSite = form.getvalue('TSite')
-if TSite == None:
-    TSite = Site
-TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
+Light2,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+
 
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
 print ('<html>')
@@ -150,9 +88,9 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
     </ul>''')
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-try:
-    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
-    BaseResults,DConsumed,condition,condition1  = FreshBatch.Run_Batch()
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, None, None,None,None,TempCurve,None,None,None)
+BaseResults,DConsumed,condition,condition1  = FreshBatch.Run_Batch()
+'''
 except:    
     print 'Content-Type: text/html'
     print 'Location: http://cas-web0.biossys.oregonstate.edu/error.html'
@@ -167,6 +105,7 @@ except:
     print '  </body>'
     print '</html>'
     cgitb.handler()
+'''
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 fig.suptitle('Juvenile Spring Chinook', fontsize=20)

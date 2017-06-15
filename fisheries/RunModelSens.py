@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os
+import os,time
 import matplotlib
 matplotlib.use('Agg')
 import sys
@@ -19,6 +19,16 @@ import pandas
 cgitb.enable()
 Scruffy()
 form = cgi.FieldStorage()
+
+address = cgi.escape(os.environ["REMOTE_ADDR"])
+script = "Sensitivity Run Page"
+with open('userlog.csv', 'a') as log:
+    log.write("IP: {}," .format(address))
+    log.write("Page: {}," .format(script))
+    log.write("Time: {}," .format(time.ctime(time.time())))
+    log.write('\n')
+log.closed
+
 # Get data from fields
 
 StartingMass = form.getvalue('Starting_Mass_In')
@@ -47,12 +57,20 @@ if Total_Daphnia != None:
 DaphSize  = form.getvalue('Daphnia Size')
 if DaphSize != None:
     DaphSize = float(DaphSize)
+else:
+    DaphSize = 1
 Light = form.getvalue('Light')
 if Light != None:
     Light = float(Light)
 Year = form.getvalue('Year')
+if Year == None:
+    Year = '2015'
 Site = form.getvalue('Site')
+if Site == None:
+    Site = 'Fall Creek'
 Month = form.getvalue('Month1')
+if Month == None:
+    Month = 'June'
 
 if depr_flag == 'YES':
     Dmax = float(form.getvalue('DmaxIn'))
@@ -83,6 +101,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
 print ('<head>')
@@ -114,7 +133,7 @@ SensFactors = Sensitivity_Expand(Sparam_Range, SensFactors)
 if SensParam == 'Starting Mass':
     Sparam = StartingMass
     for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) < 0:
+        if (Sparam * SensFactors[i] + Sparam) < .2:
             SensInputs.append(.00001)
         else:
             SensInputs.append(Sparam * SensFactors[i] + Sparam)
@@ -192,7 +211,7 @@ largestoutrem = largestout % 50
 largestout = largestout + 50 - largestoutrem
 fig=pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
-fig.suptitle('Spring Chinook', fontsize=20)
+fig.suptitle('Juvenile Spring Chinook', fontsize=20)
 
 #ax = fig.add_subplot(222)
 #ax.plot(SensFactors, SensOutPer, 'g^')
@@ -218,14 +237,14 @@ fig.suptitle('Spring Chinook', fontsize=20)
 #ax1.set_xlabel('Percent Change in %s' % SensParam)
 #ax1.grid()
 ax2 = fig.add_subplot(211)
-ax2.plot(SensInputs,Growths1, 'o')
+ax2.plot(SensInputs,Growths1)
 ax2.set_ylabel('Day 1 Growth Rate')
 #ax2.axis([-largestout, largestout, -largestout, largestout])
 #ax2.set_aspect('equal', adjustable='box')
 ax2.set_xlabel('%s Input Value' % SensParam)
 ax2.grid()
 ax3 = fig.add_subplot(212)
-ax3.plot(SensInputs,Growths, 'g^')
+ax3.plot(SensInputs,Growths)
 ax3.set_ylabel('Final Growth Rate')
 #ax3.axis([-largestout, largestout, -largestout, largestout])
 #ax3.set_aspect('equal', adjustable='box')
@@ -357,7 +376,7 @@ print('''
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
-                    <option value="2013">2013</option>
+                    
                 </select>
 
                 <label class="dd">Site:</label> <select name="Site" value="Fall Creek" id="dds">
@@ -403,7 +422,7 @@ print('''
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
-                    <option value="2013">2013</option>
+                    
                 </select>
 
                 <label class="dd">Daphnia Site:</label> <select name="DSite" id="ddds">
@@ -418,7 +437,7 @@ print('''
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
-                    <option value="2013">2013</option>
+                    
                 </select>
 
                 <label class="dd">Temperature Site:</label> <select name="TSite" id="ddts">
