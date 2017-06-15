@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os
+import os, time
 import matplotlib
 matplotlib.use('Agg')
 import sys
@@ -22,6 +22,15 @@ Scruffy()
 form = cgi.FieldStorage()
 StartingMass = 40
 sys.stderr = sys.stdout
+
+address = cgi.escape(os.environ["REMOTE_ADDR"])
+script = "Multiple Month Run Page"
+with open('userlog.csv', 'a') as log:
+    log.write("IP: {}," .format(address))
+    log.write("Page: {}," .format(script))
+    log.write("Time: {}," .format(time.ctime(time.time())))
+    log.write('\n')
+log.closed
 
 Total_Daphnia = None
 DaphSize = None
@@ -46,7 +55,7 @@ Mon = MonthInts[Month]
 Mon2 = MonthInts[Month2]
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
-fig.suptitle('Spring Chinook', fontsize=20)
+fig.suptitle('Juvenile Spring Chinook', fontsize=20)
 massax = fig.add_subplot(221)
 Mass = StartingMass
 for i in range(Mon, (Mon2+1)):
@@ -85,6 +94,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
         
     </ul>''')
@@ -130,7 +140,7 @@ print('''
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
-                    <option value="2013">2013</option>
+                    #<option value="2013">2013</option>
                </select>
 
                <label class="dd">Select Site:</label> <select name="Site" id="dds">

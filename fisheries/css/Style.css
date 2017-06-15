@@ -1,17 +1,67 @@
+table, th, td {
+    border: 1px solid black;
+}
+
+table {
+    text-align:center;
+    margin:auto;
+    width:90%;
+}
+
 #formwrap {
     margin: auto;
     background-color: #c8e9b1;
-    width: 80%;
+    width: 95%;
     overflow: hidden;
     border: solid #88a56e;
     border-width: 3px;
 }
 
+ul {
+    list-style-type: none;
+	text-align:center;
+    margin-left:auto;
+    margin-right: auto;
+    padding: 0;
+    overflow: hidden;
+    background-color: #88a56e;
+    width:90%;
+}
+
+li {
+    display:inline-block;
+    width:13%;
+}
+
+li a {
+	width:100%;
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.current {
+    background-color: #c8e9b1;
+    color: #552E00;
+}
+
 #valuewrap {
     margin: auto;
     background-color: #c8e9b1;
-    width: 80%;
-    height: 30%;
+    width: 90%;
+    height: auto;
+    overflow: hidden;
+    border: solid #88a56e;
+    border-width: 3px;
+}
+
+#valuewraps {
+    margin: auto;
+    background-color: #c8e9b1;
+    width: 90%;
+    height: 225px;
     overflow: hidden;
     border: solid #88a56e;
     border-width: 3px;
@@ -33,12 +83,12 @@
 #subutt {
     align: center;
     text-align: center;
-    width: 50%
+    width: 250px
 }
 
 body {
     color: #000000;
-    background: #dcf0d6 none no-repeat scroll center center;
+    background: #FFFFFF none no-repeat scroll center center;
 }
 
 img.head {
@@ -51,7 +101,7 @@ img.head {
 }
 
 img.results {
-    width: 50%;
+    width: 800px;
     display:block;
     margin-left:auto;
     margin-right:auto;
@@ -62,7 +112,7 @@ img.results {
 form {
     background-color: #c8e9b1;
     display: block;
-    width: 95%;
+    width: 90%;
     margin: 0 auto;
 }
 
@@ -76,7 +126,7 @@ label, input {
     display: inline-block;
 }
 input{
-    width: 30%;
+    width: 80px;
     text-align: left;
     float: center;
     font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
@@ -90,25 +140,26 @@ output{
     }
 
 #indata {
-    height:80%;
-    width:48%;
+    height:auto;
+    width:32%;
     vertical-align:bottom;
+    margin-left: 0px;
     float:left;
     background-color:#c8e9b1;
-    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+    font: normal normal 18px 'Times New Roman', Times, FreeSerif, sans-serif;
 }
 
 #outdata{
-    height:80%;
-    width:48%;
-    float: right;
+    height:auto;
+    width:32%;
+    float: left;
     vertical-align:bottom;
     background-color:#c8e9b1;
-    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+    font: normal normal 18px 'Times New Roman', Times, FreeSerif, sans-serif;
 }
 
 #datahead{
-    height:20%;
+    height:25px;
     width:100%;
     vertical-align:top;
     font-size:20px;
@@ -116,14 +167,14 @@ output{
 }
 
 div.dataleft{
-    width:75%;
-    left-margin:0%;
+    width:100%;
+    margin-left:2px;
     vertical-align:bottom;
 }
 
 div.dataright{
     float: right;
-    width:25%;
+    width:30%;
     left-margin:0%;
     vertical-align:bottom;
 }
@@ -135,7 +186,43 @@ div.inside {
 }
 
 label {
-    width: 45%;
+    width: 48%;
+    text-align: center;
+    font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
+
+label.dd {
+    width: 100px;
     text-align: right;
     font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+}
+
+label.deptem{
+font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
+width:60%;
+}
+
+input.defdisp{
+    width:80px;
+}
+
+input.deptem{
+width:70px;
+}
+
+div.deptem{
+font: normal normal  'Times New Roman', Times, FreeSerif, sans-serif;
+width:30%;
+}
+
+img.fig{
+display:block;
+margin:auto;
+width:50%;
+}
+
+img.fig2{
+display:block;
+margin:auto;
+width:40%;
 }

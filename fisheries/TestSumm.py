@@ -1,12 +1,15 @@
 #!/usr/bin/python
 
+import cgi, time, os
 
-#           <label>Please Select Ending Month:</label> <select name="Month2" id="ddm2">
-#                </select>
-#                <br>
-
-
-import cgi
+address = cgi.escape(os.environ["REMOTE_ADDR"])
+script = "Multiple Month Form"
+with open('userlog.csv', 'a') as log:
+    log.write("IP: {}," .format(address))
+    log.write("Page: {}," .format(script))
+    log.write("Time: {}," .format(time.ctime(time.time())))
+    log.write('\n')
+log.closed
 
 print ('Content-type:text/html\r\n\r\n')
 print('<html>')
@@ -25,6 +28,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
         
     </ul>
@@ -38,7 +42,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
-                    <option value="2013">2013</option>
+                    
                </select>
 
                <label class="dd">Select Site:</label> <select name="Site" id="dds">
