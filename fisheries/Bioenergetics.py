@@ -20,10 +20,13 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     FallCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
     HillsCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
     LookoutPointlength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
-
-    FCk = dict([('March',0.834),('April',0.596),('May',0.58),('June',0.72),('July',0.521),('August',0.509)])
-    HCk = dict([('March',0.583),('April',0.503),('May',0.467),('June',0.441),('July',0.32),('August',0.368)])
-    LPk = dict([('March',0.532),('April',0.565),('May',0.373),('June',0.374),('July',0.396),('August',0.39)])
+#k represents the light extinction coefficient
+    FCk16 = dict([('April',0.758),('May',0.466),('June',0.435),('July',0.451),('August',0.444),('September',0.406)])
+    HCk16 = dict([('April',0.399),('May',0.321),('June',0.440),('July',0.257),('August',0.384),('September',0.340)])
+    LPk16 = dict([('April',0.514),('May',0.373),('June',0.368),('July',0.311),('August',0.389),('September',0.343)])
+    FCk15 = dict([('March',0.834),('April',0.596),('May',0.58),('June',0.72),('July',0.521),('August',0.509)])
+    HCk15 = dict([('March',0.583),('April',0.503),('May',0.467),('June',0.441),('July',0.32),('August',0.368)])
+    LPk15 = dict([('March',0.532),('April',0.565),('May',0.373),('June',0.374),('July',0.396),('August',0.39)])
     FCk14 = dict([('June',0.404),('July',0.274),('August',0.295)])
     HCk14 = dict([('June',0.298),('July',0.274),('August',0.274)])
     LPk14 = dict([('June',0.315),('July',0.271),('August',0.282)])
@@ -31,35 +34,37 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     FCk13 = dict([('August',0.487)])
     HCk13 = dict([('August',0.291)])
     BRk13 = dict([('August',0.263)])
-    #Daphnia totals considering max densities from ALL Sites
-    #Daphnia totals only from C and Z sites
-    FCd = dict([('March', 620.83), ('April', 7220.57), ('May', 10930.27), ('June', 5020.65), ('July', 2010.06),('August', 1940.78)])
-    HCd = dict([('March', 120.57), ('April', 170.48), ('May', 5780.05), ('June', 59310.33), ('July', 4140.69),('August', 3390.29)])
-    LPd = dict([('March', 30.14), ('April', 40.91), ('May', 5780.05), ('June', 21110.15), ('July', 7030.72),('August', 13820.30)])
-    #July 2013 and July 2014 is average of June and August from same year
-    FCd14 = dict([('June', 4500.13), ('July', 0), ('August', 400.72)])
-    HCd14 = dict([('June', 2620.39), ('July', 0), ('August', 130.70)])
-    LPd14 = dict([('June', 5310.56), ('July', 0), ('August', 930.87)])
-    FCd13 = dict([('June', 8160.81), ('July', 0), ('August', 12690.20)])
-    HCd13 = dict([('June', 65840.78), ('July', 0), ('August', 8400.09)])
+#Daphnia totals weighted by subsample - only from C and Z sites #July 2013 and July 2014 are not currently available
+    FCd16 = dict([('April',72),('May',4384),('June',9472),('July',1728),('August',1056),('September',712)])
+    HCd16 = dict([('April',32),('May',1464),('June',17408),('July',1776),('August',2656),('September',2720)])
+    LPd16 = dict([('April',4),('May',88),('June',1824),('July',2296),('August',1360),('September',364)])
+    FCd15 = dict([('March', 160), ('April', 3408), ('May', 4800), ('June',784), ('July', 464),('August', 80)])
+    HCd15 = dict([('March', 40), ('April', 89), ('May', 2240), ('June', 4032), ('July', 1792),('August', 624)])
+    LPd15 = dict([('March', 12), ('April', 25), ('May', 2752), ('June', 8832), ('July', 1168),('August', 114)])
+    FCd14 = dict([('June', 1787), ('July', 0), ('August', 548)])
+    HCd14 = dict([('June', 427), ('July', 0), ('August', 159)])
+    LPd14 = dict([('June', 1192), ('July', 0), ('August', 75)])
+    FCd13 = dict([('June', 3616), ('July', 0), ('August', 896)])
+    HCd13 = dict([('June', 25088), ('July', 0), ('August', 3644)])
     BRd13 = dict([('June', 127670.43), ('July', 0), ('August', 16710.33)])
-    #Weighted for proportion D. mendotae vs. D. pulex
-    FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
-    HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
-    LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
-    BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
-    #July 2013 and July 2014 is average of June and August from same year
-    FCsize = dict([('March',1.207),('April',1.248),('May',1.139),('June',1.305),('July',1.514),('August',1.145)])
-    HCsize = dict([('March',1.455),('April',1.077),('May',1.053),('June',1.045),('July',1.769),('August',1.516)])
-    LPsize = dict([('March',1.457),('April',0.957),('May',1.064),('June',1.247),('July',1.664),('August',2.002)])
-    BRsize = dict([('March',0.628),('June',1.497),('August',1.252)])
+#Weighted for proportion D. mendotae, D. pulex, and D. rosea/ambigua averaged across available years
+    FCsize = dict([('March',1.207),('April',0.90375),('May',1.073),('June',1.262),('July',1.485),('August',1.633)])
+    HCsize = dict([('March',1.238),('April',1.152),('May',1.058),('June',1.232),('July',1.687),('August',2.005)])
+    LPsize = dict([('March',1.457),('April',0.745),('May',0.871),('June',1.237),('July',1.642),('August',2.033)])
+    BRsize = dict([('March',0.628),('April',0.780),('May',0.827),('June',1.321),('July',1.377),('August',1.282)])
 
-    if Light == None and Site =='Fall Creek' and Year == '2015':
-        Light = FCk[Month]
+    if Light == None and Site =='Fall Creek' and Year == '2016':
+        Light = FCk16[Month]
+    elif Light == None and Site =='Hills Creek' and Year == '2016':
+        Light = HCk16[Month]
+    elif Light == None and Site  == 'Lookout Point' and Year == '2016':
+        Light = LPk16[Month]
+    elif Light == None and Site =='Fall Creek' and Year == '2015':
+        Light = FCk15[Month]
     elif Light == None and Site =='Hills Creek' and Year == '2015':
-        Light = HCk[Month]
+        Light = HCk15[Month]
     elif Light == None and Site  == 'Lookout Point' and Year == '2015':
-        Light = LPk[Month]
+        Light = LPk15[Month]
     elif Light == None and Site  =='Fall Creek' and Year == '2014':
         Light = FCk14[Month]
     elif Light == None and Site =='Hills Creek' and Year == '2014':
@@ -67,12 +72,24 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     elif Light == None and Site  == 'Lookout Point' and Year == '2014':
         Light = LPk14[Month]
 
-    if Total_Daphnia == None and Site  =='Fall Creek':
-        Total_Daphnia = FCd[Month]
-    elif Total_Daphnia == None and Site =='Hills Creek':
-        Total_Daphnia = HCd[Month]
-    elif Total_Daphnia == None and Site  == 'Lookout Point':
-        Total_Daphnia = LPd[Month]
+    if Total_Daphnia == None and Site =='Fall Creek' and Year == '2016':
+        Total_Daphnia = FCd16[Month]
+    elif Total_Daphnia == None and Site =='Hills Creek' and Year == '2016':
+        Total_Daphnia = HCd16[Month]
+    elif Total_Daphnia == None and Site  == 'Lookout Point' and Year == '2016':
+        Total_Daphnia = LPd16[Month]
+    elif Total_Daphnia == None and Site =='Fall Creek' and Year == '2015':
+        Total_Daphnia = FCd15[Month]
+    elif Total_Daphnia == None and Site =='Hills Creek' and Year == '2015':
+        Total_Daphnia = HCd15[Month]
+    elif Total_Daphnia == None and Site  == 'Lookout Point' and Year == '2015':
+        Total_Daphnia = LPd15[Month]
+    elif Total_Daphnia == None and Site  =='Fall Creek' and Year == '2014':
+        Total_Daphnia = FCd14[Month]
+    elif Total_Daphnia == None and Site =='Hills Creek' and Year == '2014':
+        Total_Daphnia = HCd14[Month]
+    elif Total_Daphnia == None and Site  == 'Lookout Point' and Year == '2014':
+        Total_Daphnia = LPd14[Month]
 
     if DaphSize == None and Site  =='Fall Creek':
         DaphSize = FCsize[Month]
