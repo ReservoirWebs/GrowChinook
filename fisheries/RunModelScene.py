@@ -40,27 +40,33 @@ Site = form.getvalue('Site')
 if Site == None:
     Site = "Fall Creek"
 
-Scenario=form.getvalue('Scene')
-if Scenario == 'WSBDD':
-    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Fall Creek', form.getvalue('Month1'), form.getvalue('Year'))
-    Light = None
-    Total_Daphnia = None
-    DaphSize = None
-    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,'Fall Creek',Month,Year)
-    Total_Daphnia = None
-    DaphSize = None
-else:
-    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('Site'), form.getvalue('Month'), form.getvalue('Year'))
+Light = form.getvalue('Light')
+if Light != None:
+    Light = float(Light)
+Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
+if Total_Daphnia != None:
+    Total_Daphnia = float(Total_Daphnia)
+DaphSize = form.getvalue('Daphnia Size')
+if DaphSize != None:
+    DaphSize = float(form.getvalue('Daphnia Size'))
+
+TempCurve = None
+DYear = Year
+DMonth = Month
+DSite = Site
+TYear = Year
+TMonth = Month
+TSite = Site
+Dmax = 1000
+Dmin = -1
+Tmax = 1000
+Tmin = -1
 
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
     StartingMass=float(StartingMass)
 else:
     StartingMass = 40
-
-
-Light2,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-
 
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
 print ('<html>')
@@ -79,17 +85,81 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
-        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
 
+Scenario=form.getvalue('Scene')
+if Scenario == 'CM':
+    Year = '2014'
+    DYear = '2014'
+    TYear = '2014'
+    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(Site, Month, Year)
+    if Site == 'Fall Creek':
+        TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Hills Creek', form.getvalue('Month1'), Year)
+        TYear = '2014'
+        Light,Total_Daphnia2,DaphSize2 = GetVals(Light,Total_Daphnia,DaphSize,'Hills Creek',Month,'2014')
+        print(Light)
+        TMonth = Month
+        TSite = 'Hills Creek'
+        Light2,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+        
+elif Scenario == 'WSBDD':
+    Year = '2014'
+    DYear = '2014'
+    TYear = '2014'
+    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Fall Creek', form.getvalue('Month1'), Year)
+    TYear = '2014'
+    TMonth = Month
+    TSite = 'Fall Creek'
+    Light = None
+    Total_Daphnia = None
+    DaphSize = None
+    Light,Total_Daphnia2,DaphSize2 = GetVals(Light,Total_Daphnia,DaphSize,'Fall Creek',Month,Year)
+    Light2,Total_Daphnia, DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+    
+elif Scenario == 'STD':
+    if Site == 'Hills Creek':
+        Year = '2015' #Change to 2016 once 2016 data in
+        Dmax = 10
+    elif Site == 'Fall Creek' or 'Lookout Point':
+        Year = '2015'
+        Dmax = 10
+
+elif Scenario == 'MYD':
+    Year = '2015'
+    Dmax = 15
+
+elif Scenario == 'WWP2015':
+    Year = '2015'
+    Tmax = 20
+
+elif Scenario == 'IP22015':
+    Year = '2015'
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+    Total_Daphnia = 2*(Total_Daphnia)
+elif Scenario == 'IP102015':
+    Year = '2015'
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+    Total_Daphnia = 10*(Total_Daphnia)
+
+elif Scenario == 'DR':
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+else:
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+
+if TempCurve == None:
+    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(Site, Month, Year)
+DYear = '2015' #remove once 2014 plankton data added
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, None, None,None,None,TempCurve,None,None,None)
-BaseResults,DConsumed,condition,condition1  = FreshBatch.Run_Batch()
+print(Light,Total_Daphnia,DaphSize)
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+BaseResults,DConsumed,condition,condition1,dt,nt  = FreshBatch.Run_Batch()
 '''
 except:    
     print 'Content-Type: text/html'
@@ -106,6 +176,7 @@ except:
     print '</html>'
     cgitb.handler()
 '''
+
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 fig.suptitle('Juvenile Spring Chinook', fontsize=20)
@@ -210,8 +281,14 @@ print ('''
                 <div class="dataleft">Day Depth Occupied:
                     <div class="dataright">%.0f m</div>
                 </div>
+                <div class="dataleft">Temp at Day Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
+                </div>
                 <div class="dataleft">Night Depth Occupied:
                     <div class="dataright">%.0f m</div>
+                </div>
+                <div class="dataleft">Temp at Night Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
                 </div>
                 <div class="dataleft">Total Daphnia Consumed:
                     <div class="dataright">%.0f</div>
@@ -224,7 +301,7 @@ print ('''
 
        <br>
        ''' % (BaseResults['StartingMass'][0],BaseResults['growth'][0],BaseResults['day_depth'][0],BaseResults['night_depth'][0],BaseResults['StartingMass'][29],
-              BaseResults['growth'][29],BaseResults['day_depth'][29],BaseResults['night_depth'][29],DConsumed,condition))
+              BaseResults['growth'][29],BaseResults['day_depth'][29],dt,BaseResults['night_depth'][29],nt,DConsumed,condition))
 
 print('''   <div style="margin-top:2px;"><div style="width:600px;display:inline-block;font: normal normal 18px 'Times New Roman', Times, FreeSerif, sans-serif;">
             <div style="float:left;">Daphnia Distribution Year: %s,  Site: %s,  and Month: %s
@@ -234,11 +311,6 @@ print('''   <div style="margin-top:2px;"><div style="width:600px;display:inline-
             </div>
             </div>
             ''' %(DYear,DSite,DMonth,TYear,TSite,TMonth))
-if depr_flag == "YES":
-    print('''<div style="width:600px;display:inline-block;font: normal normal 18px 'Times New Roman', Times, FreeSerif, sans-serif;"><div style="float:left;">Depth restricted to between %.2fm and %.2fm.</div></div>''' % (Dmin,Dmax))
-if tempr_flag == "YES":
-    print('''<div style="float:left;">Temperature restricted to between %.2f degrees and %.2f degrees.</div>
-    ''' % (Tmin, Tmax))
 
 print('''
 <br><div style="float:left;">Download Full Results?
@@ -332,13 +404,14 @@ print('''
                 <br>
         </div>
             <div style="display:inline-block;margin:auto;width:75%">
-                <div id="subutt" style="float:right;">
-                    <input type="submit" value="Submit"/>
-                </div>
                 <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
                 </div><br>
+                <div id="subutt" style="float:right;">
+                    <input type="submit" value="Submit"/>
+                </div>
+                
             </div><br>
         </form>
     </div>
