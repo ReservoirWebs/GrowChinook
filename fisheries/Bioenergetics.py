@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!C:\Anaconda3\python.exe
 import pylab,glob,os,time
 from numpy import *
 from scipy.interpolate import interp1d
@@ -127,6 +127,8 @@ class Batch:
         self.Dmin = Dmin
         self.Tmax = Tmax
         self.Tmin = Tmin
+        self.dtfinal = 0
+        self.ntfinal = 0
         self.Depths = []
         self.SparamExp = []
         self.SwimSpeed = 2 #Body lengths (from grey lit((())))
@@ -179,7 +181,6 @@ class Batch:
                 if ((float(row['temp']) <= self.Tmax) and (float(row['temp']) >= self.Tmin)):
                     self.temperatures.append(float(row['temp']))
                     self.Depths.append(float(row['depth']))
-        
 
         self.predatorenergy = self.predatorenergy(self.StartingMass)
         self.depth_from_temp = interp1d(self.temperatures, self.Depths, fill_value=0, bounds_error=False)
@@ -410,7 +411,7 @@ class Batch:
         output = []
         finalLW = []
 
-        self.out = {'StartingLength':[],'StartingMass':[],'growth':[],'day_depth':[],'night_depth':[]}
+        self.out = {'Year':[],'Site':[],'Month':[],'Fish Starting Mass':[],'Light Extinction Coefficient':[],'Daphnia Size':[],'Daphnia Density':[],'StartingLength':[],'StartingMass':[],'growth':[],'day_depth':[],'night_depth':[]}
         condition1 = float(100*self.StartingMass*((self.StartingLength/10)**(-3.0)))
         for d in range(ndays):
             (day_depth, day_growth, day_consumption) = self.best_depth(self.StartingLength, self.StartingMass, day_hours, self.DayLight, self.Depths)
@@ -422,13 +423,22 @@ class Batch:
             if growth > 0:
                 self.StartingLength = (self.StartingMass / 0.0003) ** (1 / 2.217)  # weight to fork length (MacFarlane and Norton 2008)
                 #Checked fish lengths against this and by end of summer fish weigh much less than they 'should' based on their length
-
+            
+            self.out['Year'].append(self.Year)
+            self.out['Site'].append(self.Site)
+            self.out['Month'].append(self.Month)
+            self.out['Fish Starting Mass'].append(self.StartingMass)
+            self.out['Light Extinction Coefficient'].append(self.Light)
+            self.out['Daphnia Size'].append(self.DaphSize)
+            self.out['Daphnia Density'].append(self.TotalDaphnia)
             self.out['day_depth'].append(day_depth)
             self.out['night_depth'].append(night_depth)
             self.out['growth'].append(growth)
             self.out['StartingMass'].append(self.StartingMass)
             self.out['StartingLength'].append(self.StartingLength)
-            
+            dtfinal = self.day_temp
+            ntfinal = self.night_temp
+
         condition = float(100*(self.StartingMass-self.SMass)*((self.StartingLength/10)**(-3.0)))
-        return (self.out, dailyconsume,condition,condition1)
+        return (self.out, dailyconsume,condition,condition1,dtfinal,ntfinal)
 

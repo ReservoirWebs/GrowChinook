@@ -100,6 +100,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -110,7 +111,7 @@ print ('</head>')
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
-BaseResults,DConsumed,condition,condition1  = FreshBatch.Run_Batch()
+BaseResults,DConsumed,condition,condition1,dt,nt  = FreshBatch.Run_Batch()
 
 largestout = 0.0
 numskips = 0
@@ -180,7 +181,7 @@ elif SensParam == 'Daphnia Size':
         Growths.append(results[i][0]['growth'][29])
         Growths1.append(results[i][0]['growth'][0])
 
-elif SensParam == 'K':
+elif SensParam == 'Light':
     Sparam = Light
     for i in range(11):
         if (Sparam * SensFactors[i] + Sparam) > 0:
@@ -330,8 +331,14 @@ print ('''  </div>
                 <div class="dataleft">Day Depth Occupied:
                     <div class="dataright">%.0f m</div>
                 </div>
+                <div class="dataleft">Temp at Day Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
+                </div>
                 <div class="dataleft">Night Depth Occupied:
                     <div class="dataright">%.0f m</div>
+                </div>
+                <div class="dataleft">Temp at Night Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
                 </div>
                 <div class="dataleft">Total Daphnia Consumed:
                     <div class="dataright">%.0f</div>
@@ -343,7 +350,7 @@ print ('''  </div>
 
        </div>
        </div><br>
-       ''' % (BaseResults['StartingMass'][0],BaseResults['growth'][0],BaseResults['day_depth'][0],BaseResults['night_depth'][0],BaseResults['StartingMass'][29],
+       ''' % (BaseResults['StartingMass'][0],BaseResults['growth'][0],BaseResults['day_depth'][0],dt,BaseResults['night_depth'][0],nt,BaseResults['StartingMass'][29],
               BaseResults['growth'][29],BaseResults['day_depth'][29],BaseResults['night_depth'][29],DConsumed,condition))
 
 print('''
@@ -447,10 +454,15 @@ print('''
                 </select>
                 </div>
                     <br>
-                    <br>
+                    <br><div style="float:left;">
+                <label>Enter Name to Display on Tab:</label>
+                <input type="text" style="width:50%;" name="TabName" id="TabNameID">
+                </div><br>
+
                     <div id="subutt">
                         <input type="submit" value="Submit"/>
                     </div>
+                
         </form>
     </div>
 </body>

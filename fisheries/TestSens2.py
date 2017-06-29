@@ -100,6 +100,7 @@ function updateLightTextInput(val) {
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -114,7 +115,7 @@ function updateLightTextInput(val) {
                         <option value="Starting Mass" selected>Starting Mass</option>
                         <option value="Total Daphnia">Total Daphnia</option>
                         <option value="Daphnia Size">Daphnia Size</option>
-                        <option value="K">Light</option>
+                        <option value="Light">Light</option>
                     </select>
                     </div>
 
@@ -146,7 +147,7 @@ function updateLightTextInput(val) {
 
 
                 <div><br><br><label>Daphnia Density (per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
-                <label>Light Extinction Coefficient</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
+                <label>Light Extinction Coefficient (Higher is Darker)</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                 <label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
                 </div>
                 </div>
@@ -168,7 +169,10 @@ function updateLightTextInput(val) {
 		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
                 <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
-
+                <div style="float:left;">
+                <label>Enter Name to Display on Tab:</label>
+                <input type="text" style="width:50%;" name="TabName" id="TabNameID">
+                </div><br>
               		    <div id="subutt">
                         <input type="submit" value="Submit"/>
                     </div>

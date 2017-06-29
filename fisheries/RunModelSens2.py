@@ -41,7 +41,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = StartingMass
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1 = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,nt = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i])/100 + Sparam)
@@ -51,7 +51,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
             csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Starting Mass", SensInputs[i]))]
             batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
-            res, taway, condition, condition1 = batches[i].Run_Batch()
+            res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
             results.append(res)
             SensOutPer.append(results[i]['growth'][29])
             SensOutPerD1.append(results[i]['growth'][0])
@@ -62,7 +62,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = Total_Daphnia
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1 = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
         batches = []
         for z in range(11):
             sensIn = float(Sparam * (SensFactors[z]/100) + Sparam)
@@ -73,7 +73,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
             newbatch = Batch(Site, month, Year, Light, DaphSize, SensInputs[z], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
             csvheaders[z] = [Site, month, Year, ("%s: %f" % ("Total Daphnia", SensInputs[z]))]
             batches.append(newbatch)
-            res, taway, condition, condition1 = batches[z].Run_Batch()
+            res, taway, condition, condition1,dt,n = batches[z].Run_Batch()
             results.append(res)
             SensOutPer.append(100 * ((results[z]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
             SensOutPerD1.append(100 * ((results[z]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -84,7 +84,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = DaphSize
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1 = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
@@ -92,7 +92,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
                 batches.append(Batch(Site, month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
                 csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Daphnia Size", SensInputs[i]))]
-                res, taway, condition, condition1 = batches[i].Run_Batch()
+                res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
                 results.append(res)
                 SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
                 SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -108,11 +108,11 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 Growths.append(None)
                 Growths1.append(None)
 
-    elif SensParam == 'K':
+    elif SensParam == 'Light':
         Sparam = Light
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1 = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
@@ -120,7 +120,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
                 batches.append(Batch(Site, month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
                 csvheaders[i] = [Site, month, Year, ("%s: %f" % ("LEC(k)", SensInputs[i]))]
-                res, taway, condition, condition1 = batches[i].Run_Batch()
+                res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
                 results.append(res)
                 SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
                 SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -236,6 +236,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -342,26 +343,26 @@ csvheaders=[[] for i in range(11)]
 try:
     if Year == '2015':
         for m in (Months2015):
-            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,largestout,oldresults,oldresults1)
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,1000,-1,largestout,oldresults,oldresults1)
     elif Year == '2014':
         for m in (Months2014):
-            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,1000,-1,largestout,oldresults,oldresults1)
     elif Year == '2013':
         for m in (Months2013):
-            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,largestout,oldresults,oldresults1)
+            largestout,oldresults,oldresults1,SensInputs = RunSens(Site, m, m,Year, Light, DaphSize, Total_Daphnia, StartingMass, 1000, -1,Tmax,Tmin, 1000, -1,largestout,oldresults,oldresults1)
 except:
-    print 'Content-Type: text/html'
-    print 'Location: http://cas-web0.biossys.oregonstate.edu/error.html'
-    print # HTTP says you have to have a blank line between headers and content
-    print '<html>'
-    print '  <head>'
-    print '    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />'
-    print '    <title>You are going to be redirected</title>'
-    print '  </head>' 
-    print '  <body>'
-    print '    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>'
-    print '  </body>'
-    print '</html>'
+    #print 'Content-Type: text/html'
+    #print 'Location: http://cas-web0.biossys.oregonstate.edu/error.html'
+    #print # HTTP says you have to have a blank line between headers and content
+    #print '<html>'
+    #print '  <head>'
+    #print '    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />'
+    #print '    <title>You are going to be redirected</title>'
+    #print '  </head>' 
+    #print '  <body>'
+    #print '    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>'
+    #print '  </body>'
+    #print '</html>'
     cgitb.handler()
 
 #if SensParam == 'Total Daphnia':
@@ -424,8 +425,14 @@ if depr_flag == "YES":
                 <div class="dataleft">%s Final Day Depth:
                     <div class="dataright">%.0f m</div>
                 </div>
-                <div class="dataleft">%s Final Night Depth:
+                <div class="dataleft">Temp at Day Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
+                </div>
+                <div class="dataleft">Night Depth Occupied:
                     <div class="dataright">%.0f m</div>
+                </div>
+                <div class="dataleft">Temp at Night Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
                 </div>
                 <div class="dataleft">%s Total Daphnia Consumed:
                     <div class="dataright">%.0f</div>
@@ -433,7 +440,7 @@ if depr_flag == "YES":
             </div>
        </div>
        </div><br>
-        % (Month,SensFactors[10],results[10][0]['StartingMass'][29],Month,SensFactors[10],results[0][0]['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],Month,BaseResults['night_depth'][29],Month,DConsumed))
+        % (Month,SensFactors[10],results[10][0]['StartingMass'][29],Month,SensFactors[10],results[0][0]['StartingMass'][29],Month,BaseResults['growth'][29],Month,BaseResults['day_depth'][29],dt,Month,BaseResults['night_depth'][29],nt,Month,DConsumed))
 '''
 
 print('''<div style="display:block; margin-left:auto; margin-right:auto;">Download Full Results?
@@ -582,10 +589,15 @@ function updateLightTextInput(val) {
 		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
                 <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
-
-              		    <div id="subutt">
+		
+		<div style="float:left;">
+                <label>Enter Name to Display on Tab:</label>
+                <input type="text" style="width:50%;" name="TabName" id="TabNameID">
+            </div><br>
+              	<div id="subutt">
                         <input type="submit" value="Submit"/>
                     </div>
+                
         </form>
     </div>
 </body>

@@ -30,6 +30,15 @@ title=form.getvalue('TabName')
 if title == None:
     title="GrowChinook Results"
 
+fileitem = form["userfile"]
+if fileitem.file:
+    # It's an uploaded file; count lines
+    linecount = 0
+    while 1:
+        line = fileitem.file.readline()
+        if not line: break
+        linecount = linecount + 1
+
 TempCurve = form.getvalue('tempCurve')
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
@@ -103,7 +112,6 @@ else:
     Tmin,Tmax = -1,1000
     
 
-
 DYear = form.getvalue('DYear')
 if DYear == None:
     DYear = Year
@@ -124,6 +132,9 @@ if TSite == None:
     TSite = Site
 TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
 
+if form.getvalue('tempupload') != None:
+    TempCurve = form.getvalue('tempupload')
+
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
 print ('<html>')
 print('<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />')
@@ -133,6 +144,16 @@ print ('</head>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <script src="/js/JavaForFish.js"></script>
+<script>
+window.onload = function() {
+    function getFormData(){ 
+        var mass=form.getvalue('Starting_Mass_In');
+        }
+    carryOverValues(mass);
+}
+  
+};
+</script>
 <img class="head" src="/css/src/LPR.jpg">
 <head>
     <title>GrowChinook</title>
@@ -145,6 +166,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
@@ -152,21 +174,21 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 try:
     FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
-    BaseResults,DConsumed,condition,condition1  = FreshBatch.Run_Batch()
+    BaseResults,DConsumed,condition,condition1,daytemp,nighttemp  = FreshBatch.Run_Batch()
 except:    
-    print 'Content-Type: text/html'
-    print 'Location: http://cas-web0.biossys.oregonstate.edu/error.html'
-    print 
-    print '<html>'
-    print '  <head>'
-    print '    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />'
-    print '    <title>You are going to be redirected</title>'
-    print '  </head>' 
-    print '  <body>'
-    print '    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>'
-    print '  </body>'
-    print '</html>'
+    #print ('Content-Type: text/html')
+    #print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
+    #print ('<html>')
+    #print ('  <head>')
+    #print ('    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
+    #print ('    <title>You are going to be redirected</title>')
+    #print ('  </head>') 
+    #print ('  <body>')
+    #print ('    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
+    #print ('  </body>')
+    #print ('</html>')
     cgitb.handler()
+
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 fig.suptitle('Juvenile Spring Chinook', fontsize=20)
@@ -271,8 +293,14 @@ print ('''
                 <div class="dataleft">Day Depth Occupied:
                     <div class="dataright">%.0f m</div>
                 </div>
+                <div class="dataleft">Temp at Day Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
+                </div>
                 <div class="dataleft">Night Depth Occupied:
                     <div class="dataright">%.0f m</div>
+                </div>
+                <div class="dataleft">Temp at Night Depth Occupied:
+                    <div class="dataright">%.0f &#176;C</div>
                 </div>
                 <div class="dataleft">Total Daphnia Consumed:
                     <div class="dataright">%.0f</div>
@@ -285,7 +313,7 @@ print ('''
 
        <br>
        ''' % (BaseResults['StartingMass'][0],BaseResults['growth'][0],BaseResults['day_depth'][0],BaseResults['night_depth'][0],BaseResults['StartingMass'][29],
-              BaseResults['growth'][29],BaseResults['day_depth'][29],BaseResults['night_depth'][29],DConsumed,condition))
+              BaseResults['growth'][29],BaseResults['day_depth'][29],daytemp,BaseResults['night_depth'][29],nighttemp,DConsumed,condition))
 
 print('''   <div style="margin-top:2px;"><div style="width:600px;display:inline-block;font: normal normal 18px 'Times New Roman', Times, FreeSerif, sans-serif;">
             <div style="float:left;">Daphnia Distribution Year: %s,  Site: %s,  and Month: %s
@@ -311,14 +339,15 @@ print('''
 <body>
     <h2>Enter Values to GrowChinook</h2>
     <div id="formwrap">
-        <form action="RunModel.py" method="post" target="_blank">
+        <form id="myform" action="RunModel.py" method="post" target="_blank">
            <b>First, enter a Starting Mass for the fish. Then select a default Year, Month, and Site, which will be used to fill in any fields you may choose to leave blank.
            Now you may adjust any values you like, and can at any time reassert the default values for your selected Year, Month, and Site by clicking the "Apply Observed Values" button.</b><br><br>
            <div id="sec1">
-                <label>Enter Fish Starting Mass (g):</label><input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassSlide.value = SMass_TextInID.value"> <br><br>
+                <label>Enter Fish Starting Mass (g):</label><input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassSlide.value = SMass_TextInID.value"> <br>
+                <p>Fish Size Guide: Small: <0.1-1.3 g (roughly 30-50 mm) <br> Large: 90-180 g (roughly 200-250mm)</p>
                 <p style="text-align:center;width:80%;"><b>Select a Year, Month, and Site to fill Daphnia Density, Daphnia Size, and Light Extinction Coefficient with Observed Values</b>
                 <div style="margin:auto;">
-                <label class="dd">Year:</label> <select name="Year" value="2015" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
+                <label class="dd">Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
                     <option value=""></option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
@@ -328,7 +357,7 @@ print('''
                 <label class="dd">Site:</label> <select name="Site" value="Fall Creek" id="dds">
                 </select>
 
-                <label class="dd">Month:</label> <select name="Month1" value="June" id="ddm1" onchange="configureMonthDropDowns(this,document.getElementById('ddm2'))">
+                <label class="dd">Month:</label> <select name="Month1" value="June" id="ddm1">
                 </select>
                 <br>
                 </div>
@@ -348,6 +377,7 @@ print('''
 		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
                 <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
+                
 
             </div>
             <div id="sec2">
@@ -393,18 +423,22 @@ print('''
                 <br>
         </div>
             <div style="display:inline-block;margin:auto;width:75%">
-                <div id="subutt" style="float:right;">
-                    <input type="submit" value="Submit"/>
-                </div>
                 <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
                 </div><br>
-            </div><br>
+                <div id="subutt" style="float:right;">
+                    <input type="submit" value="Submit"/>
+                </div>
+                
+                </div><br>
+
+                
+            
         </form>
     </div>
 </body>
-''' .format(fname))
+''' .format(fname,Year,Site,Month))
 print ('</html>')
 
 

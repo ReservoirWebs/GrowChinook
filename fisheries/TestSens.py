@@ -30,6 +30,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -43,7 +44,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                         <option value="Starting Mass" selected>Starting Mass</option>
                         <option value="Total Daphnia">Total Daphnia</option>
                         <option value="Daphnia Size">Daphnia Size</option>
-                        <option value="K">Light</option>
+                        <option value="Light">Light</option>
                     </select>
                     </div>
 
@@ -134,6 +135,10 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 </div>
                     <br>
                     <br>
+                    <div style="float:left;">
+                <label>Enter Name to Display on Tab:</label>
+                <input type="text" style="width:50%;" name="TabName" id="TabNameID">
+                </div><br>
                     <div id="subutt" style="margin:auto;">
                         <input type="submit" value="Submit"/>
                     </div>

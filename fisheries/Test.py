@@ -32,6 +32,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -68,7 +69,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                     </button>
                 </div><br>
                 Observed:<input class="defdisp" type="text" name="TotDDef" id="TotDDef" value="" readonly><label>Daphnia Density (per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
-                Observed:<input class="defdisp" type="text" name="LightDef" id="LightDef" value="" readonly><label>Light Extinction Coefficient</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
+                Observed:<input class="defdisp" type="text" name="LightDef" id="LightDef" value="" readonly><label>Light Extinction Coefficient (Higher is Darker)</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                 Observed:<input class="defdisp" type="text" name="DaphSDef" id="DaphSDef" value="" readonly><label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
                 <div class="deptem" style="float:left;"><p style="margin-top:auto;">
                     <b>Optional: Set to restrict depth</b>
@@ -125,18 +126,28 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                         <select name="TMonth" id="ddtm">
                         </select><br><br><br>
                     </div>
+                    
+                    
                 </div>
             </div>
-            <div style="display:inline-block;margin:auto;width:75%">
-                <div id="subutt" style="float:right;">
-                    <input type="submit" value="Submit"/>
-                </div>
             <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
             </div><br>
+            <div style="display:inline-block;margin:auto;width:75%">
+                <div id="subutt" style="float:right;">
+                    <input type="submit" value="Submit"/>
+                </div>
+            
         </div>
     </form>
+<div style="float:left;">Download Temperature Template to Use Custom Temps
+                        <a href="/TemperatureTemplate.csv" download>Temperature Template</a>
+    <form action = "/upload.py" method="POST" enctype="multipart/form-data">
+    <input type="file" name="filename">
+    <input type="submit">
+    </form>
+                    </div>
 </body>
 ''')
 print ('</html>')
