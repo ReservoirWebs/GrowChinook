@@ -1,4 +1,4 @@
-#!C:\Anaconda3\python.exe
+#!/usr/bin/python
 import pylab,glob,os,time
 from numpy import *
 from scipy.interpolate import interp1d
