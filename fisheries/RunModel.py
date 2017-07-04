@@ -29,16 +29,15 @@ form = cgi.FieldStorage()
 title=form.getvalue('TabName')
 if title == None:
     title="GrowChinook Results"
-
+'''
 fileitem = form["userfile"]
 if fileitem.file:
-    # It's an uploaded file; count lines
     linecount = 0
     while 1:
         line = fileitem.file.readline()
         if not line: break
         linecount = linecount + 1
-
+'''
 TempCurve = form.getvalue('tempCurve')
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
@@ -76,7 +75,10 @@ if Light == None:
 else:
     Light = float(Light)
 Year = form.getvalue('Year')
-if Year == None:
+if Year == '2016':
+    TYear = '2016'
+    Year = '2016'
+elif Year == None:
     Year = "2015"
 Month = form.getvalue('Month1')
 if Month == None:
@@ -130,10 +132,8 @@ if TMonth == None:
 TSite = form.getvalue('TSite')
 if TSite == None:
     TSite = Site
-TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
+TempCurve = '{0}_T_{1}_{2}.csv'.format(TSite, TMonth, TYear)
 
-if form.getvalue('tempupload') != None:
-    TempCurve = form.getvalue('tempupload')
 
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
 print ('<html>')
@@ -144,16 +144,7 @@ print ('</head>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <script src="/js/JavaForFish.js"></script>
-<script>
-window.onload = function() {
-    function getFormData(){ 
-        var mass=form.getvalue('Starting_Mass_In');
-        }
-    carryOverValues(mass);
-}
-  
-};
-</script>
+
 <img class="head" src="/css/src/LPR.jpg">
 <head>
     <title>GrowChinook</title>
@@ -179,13 +170,13 @@ except:
     #print ('Content-Type: text/html')
     #print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
     #print ('<html>')
-    #print ('  <head>')
-    #print ('    <meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
-    #print ('    <title>You are going to be redirected</title>')
-    #print ('  </head>') 
-    #print ('  <body>')
-    #print ('    Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
-    #print ('  </body>')
+    #print ('<head>')
+    #print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
+    #print ('<title>You are going to be redirected</title>')
+    #print ('</head>') 
+    #print ('<body>')
+    #print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
+    #print ('</body>')
     #print ('</html>')
     cgitb.handler()
 

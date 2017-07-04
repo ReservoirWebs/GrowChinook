@@ -52,6 +52,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                     <label class="dd">Year:</label>
                     <select name="Year" value="2015" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
                         <option value=""></option>
+                        <option value="2016">2016</option>
                         <option value="2015">2015</option>
                         <option value="2014">2014</option>
                     </select>
