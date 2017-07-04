@@ -156,8 +156,9 @@ class Batch:
             reader = DictReader(fid)
             zooplankton_data = [r for r in reader]
         (self.daphline, self.daph_auc) = self.compute_daphniabydepth(zooplankton_data)
-
-        self.StartingLength = (self.StartingMass/0.0003)**(1/2.217)
+        self.StartingLength = (self.StartingMass / 0.000004) ** (1 / 3.1776) # From Lookout Point and Fall Creek downstream screw trap data (R2 = 0.9933)
+        #self.StartingLength = (self.StartingMass/0.0003)**(1/2.217) #see note below
+        
         if self.Tmax == None:
             self.Tmax = 1000
         if self.Tmin == None:
@@ -201,7 +202,7 @@ class Batch:
         # get rows for site, season, depth
         rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
                                                 and r['Month'] == self.DMonth
-                                                and r['Year'] == '2015')]
+                                                and r['Year'] == self.DYear)]
         x = [float(r['Depth']) for r in rows]
         y = [float(r['Total Daphnia']) for r in rows]
 
@@ -421,8 +422,9 @@ class Batch:
             dailyconsume = ((day_consumption + night_consumption)*self.StartingMass)/self.DaphWeight
             self.StartingMass += growth
             if growth > 0:
-                self.StartingLength = (self.StartingMass / 0.0003) ** (1 / 2.217)  # weight to fork length (MacFarlane and Norton 2008)
-                #Checked fish lengths against this and by end of summer fish weigh much less than they 'should' based on their length
+                self.StartingLength = (self.StartingMass / 0.000004) ** (1 / 3.1776) # From LP and FC screw trap data (R2 = 0.9933)
+                #self.StartingLength = (self.StartingMass / 0.0003) ** (1 / 2.217)  # weight to fork length (MacFarlane and Norton 2008)
+                    #Checked fish lengths against this and by end of summer fish weigh much less than they 'should' based on their length
             
             self.out['Year'].append(self.Year)
             self.out['Site'].append(self.Site)
