@@ -139,7 +139,10 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 <div id="subutt" style="float:right;">
                     <input type="submit" value="Submit"/>
                 </div>
-            
+            <div style="float:left;">
+                <label>Enter Elevation:</label>
+                <input type="text" style="width:50%;" name="Elev" id="ElevID">
+            </div><br>
         </div>
     </form>
 <div style="float:left;">Download Temperature Template to Use Custom Temps
@@ -149,6 +152,8 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
     <input type="submit">
     </form>
                     </div>
+    <br>
+    
 </body>
 ''')
 print ('</html>')

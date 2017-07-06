@@ -50,7 +50,7 @@ if form.getvalue('tempr') == 'yes':
     tempr_flag = 'YES'
 else:
     tempr_flag = 'NO'
-
+Elev = form.getvalue('Elev')
 Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
 if Total_Daphnia != None:
     Total_Daphnia = float(Total_Daphnia)
@@ -110,8 +110,8 @@ print ('<title>Here are Your Results.</title>')
 print ('</head>')
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
-BaseResults,DConsumed,condition,condition1,dt,nt  = FreshBatch.Run_Batch()
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev)
+BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
 
 largestout = 0.0
 numskips = 0

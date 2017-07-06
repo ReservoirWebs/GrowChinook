@@ -16,6 +16,20 @@ def Scruffy(): #Scruffy's the janitor. Kills any output files older than one hou
         if (time.time() - age) >= 3600:
             os.remove(file)
 
+def GetSustainEst(Elevation,Total_Daphnia,Consumed):
+    Elevation = (int(Elevation)/3.281)
+    if Elevation > 254:
+        Elevation = 254
+    elif Elevation < 209:
+        Elevation = 209
+    Elevation = str(Elevation)
+    FallCreekBath = dict([('254',7172409.8),('253',6983192.2),('252',6794680.6),('251',6606033.7),('250',6408580.1),('249',6192611.9),('248',5959985.2),('247',5721028.5),('246',5504466.9),('245',5295291.9),('244',5093574.5),('243',4885259.6),('242',4691561.0),('241',4480284.8),('240',4263365.1),('239',4063772.1),('238',3881897.4),('237',3701318.7),('236',3542155.0),('235',3401037.1),('234',3253419.4),('233',3111623.4),('232',2964049.1),('231',2826196.4),('230',2708579.2),('229',2580283.9),('228',2460461.6),('227',2362731.2),('226',2250987.7),('225',2099456.6),('224',1976720.7),('223',1826783.5),('222',1675439.7),('221',1551214.6),('220',1388328.5),('219',1239093.6),('218',1098432.7),('217',938778.8),('216',794499.8),('215',681568.4),('214',543763.1),('213',418760.8),('212',283958.6),('211',118359.2),('210',58565.3),('209',22749.4)])
+    Area = FallCreekBath[Elevation]
+    Consumable = (Area*Total_Daphnia*0.58)
+    PopEst = Consumable/(Consumed*4)
+    return PopEst
+
+
 def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     FallCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
     HillsCreeklength = dict([('March',31),('April',30),('May',31),('June',30),('July',31),('August',31),('September',30)])
@@ -110,7 +124,7 @@ def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
 
 
 class Batch:
-    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite):
+    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elevation):
         self.Site = Site
         self.Month = Month
         self.Year = Year
@@ -139,6 +153,7 @@ class Batch:
         self.out = {}
         self.DaphWeightdry = (exp(1.468 + 2.83 * log(self.DaphSize))) / 1000000  # Based of Cornell equation (g) #WetDaphWeight <- DaphWeight*(8.7/0.322) #From Ghazy, others use ~10%
         self.DaphWeight = self.DaphWeightdry * 8.7 / 0.322
+        self.Elevation = Elevation
         
         if self.DYear == None:
             self.DYear = self.Year
@@ -196,13 +211,11 @@ class Batch:
         self.night_depth = night_depth or self.depth_from_temp(night_temp)
 
 
-
-
     def compute_daphniabydepth(self, zooplankton_data):
         # get rows for site, season, depth
         rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
                                                 and r['Month'] == self.DMonth
-                                                and r['Year'] == self.DYear)]
+                                                and r['Year'] == '2015')]
         x = [float(r['Depth']) for r in rows]
         y = [float(r['Total Daphnia']) for r in rows]
 
@@ -417,7 +430,8 @@ class Batch:
         for d in range(ndays):
             (day_depth, day_growth, day_consumption) = self.best_depth(self.StartingLength, self.StartingMass, day_hours, self.DayLight, self.Depths)
             (night_depth, night_growth, night_consumption) = self.best_depth(self.StartingLength, self.StartingMass, night_hours, self.NightLight, self.Depths)
-
+            self.day_temp = self.temp_from_depth(day_depth)
+            self.night_temp = self.temp_from_depth(night_depth)
             growth = day_growth + night_growth
             dailyconsume = ((day_consumption + night_consumption)*self.StartingMass)/self.DaphWeight
             self.StartingMass += growth
@@ -441,6 +455,7 @@ class Batch:
             dtfinal = self.day_temp
             ntfinal = self.night_temp
 
+        PopEst = GetSustainEst(self.Elevation,self.TotalDaphnia,dailyconsume)
         condition = float(100*(self.StartingMass-self.SMass)*((self.StartingLength/10)**(-3.0)))
-        return (self.out, dailyconsume,condition,condition1,dtfinal,ntfinal)
+        return (self.out, dailyconsume,condition,condition1,dtfinal,ntfinal,PopEst)
 
