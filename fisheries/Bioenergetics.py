@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!\usr\bin\python
 import pylab,glob,os,time
 from numpy import *
 from scipy.interpolate import interp1d
