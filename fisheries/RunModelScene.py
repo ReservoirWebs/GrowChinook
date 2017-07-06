@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!\usr\bin\python
 
 import os, time
 import sys
@@ -29,7 +29,7 @@ form = cgi.FieldStorage()
 title=form.getvalue('TabName')
 if title == None:
     title="GrowChinook Results"
-
+Elev = form.getvalue('Elev')
 Year = form.getvalue('Year')
 if Year == None:
     Year = "2015"
@@ -159,7 +159,7 @@ DYear = '2015' #remove once 2014 plankton data added
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 print(Light,Total_Daphnia,DaphSize)
 FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
-BaseResults,DConsumed,condition,condition1,dt,nt  = FreshBatch.Run_Batch()
+BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
 '''
 except:    
     print 'Content-Type: text/html'

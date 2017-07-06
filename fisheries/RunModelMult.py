@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!\usr\bin\python
 import os, time
 import matplotlib
 matplotlib.use('Agg')
@@ -32,6 +31,7 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
+Elev = form.getvalue('Elev')
 Total_Daphnia = None
 DaphSize = None
 TempCurve = None

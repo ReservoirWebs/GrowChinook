@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!\usr\bin\python
 
 import os, time
 import matplotlib
@@ -41,7 +41,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = StartingMass
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1,dt,nt = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,nt,PopEst = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i])/100 + Sparam)
@@ -51,7 +51,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
             csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Starting Mass", SensInputs[i]))]
             batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
-            res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
+            res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
             results.append(res)
             SensOutPer.append(results[i]['growth'][29])
             SensOutPerD1.append(results[i]['growth'][0])
@@ -62,7 +62,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = Total_Daphnia
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
         for z in range(11):
             sensIn = float(Sparam * (SensFactors[z]/100) + Sparam)
@@ -73,7 +73,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
             newbatch = Batch(Site, month, Year, Light, DaphSize, SensInputs[z], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
             csvheaders[z] = [Site, month, Year, ("%s: %f" % ("Total Daphnia", SensInputs[z]))]
             batches.append(newbatch)
-            res, taway, condition, condition1,dt,n = batches[z].Run_Batch()
+            res, taway, condition, condition1,dt,n,PopEst = batches[z].Run_Batch()
             results.append(res)
             SensOutPer.append(100 * ((results[z]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
             SensOutPerD1.append(100 * ((results[z]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -84,7 +84,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = DaphSize
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
@@ -92,7 +92,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
                 batches.append(Batch(Site, month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
                 csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Daphnia Size", SensInputs[i]))]
-                res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
+                res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
                 results.append(res)
                 SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
                 SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -112,7 +112,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
         Sparam = Light
         FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
         results = []
-        BaseResults, DConsumed, condition, condition1,dt,n = FreshBatch.Run_Batch()
+        BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
         for i in range(11):
             sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
@@ -120,7 +120,7 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
                 SensInputs.append(sensIn)
                 batches.append(Batch(Site, month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
                 csvheaders[i] = [Site, month, Year, ("%s: %f" % ("LEC(k)", SensInputs[i]))]
-                res, taway, condition, condition1,dt,n = batches[i].Run_Batch()
+                res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
                 results.append(res)
                 SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
                 SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -164,8 +164,10 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
 
 matplotlib.rcParams.update({'font.size': 12})
 form = cgi.FieldStorage()
-# Get data from fields
-
+title=form.getvalue('TabName')
+if title == None:
+    title="GrowChinook Results"
+Elev = form.getvalue('Elev')
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
     StartingMass=float(StartingMass)
@@ -227,7 +229,7 @@ print ('<html>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <img class="head" src="/css/src/LPR.jpg">
 <head>
-    <title>GrowChinook</title>
+    <title>{}</title>
 </head>
 <body>
     <ul>
@@ -240,9 +242,9 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
-    </ul>''')
+    </ul>'''.format(title))
 print ('<head>')
-print ('<title>Here are Your Results.</title>')
+print ('<title>{}</title>'.format(title))
 print ('</head>')
 
 largestout = 0.0
@@ -302,7 +304,7 @@ else:
 if SensParam == 'Starting Mass':
     ax2.set_xlabel('Starting Mass')
 elif SensParam == 'Total Daphnia':
-    ax2.set_xlabel('Total Daphnia (Thousands)')
+    ax2.set_xlabel('Total Daphnia')
 else:
     ax2.set_xlabel('%s' % SensParam)
 if SensParam != 'Starting Mass':
