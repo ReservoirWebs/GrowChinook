@@ -1,4 +1,4 @@
-#!\usr\bin\python
+#!/usr/bin/python
 import os, time
 import matplotlib
 matplotlib.use('Agg')
