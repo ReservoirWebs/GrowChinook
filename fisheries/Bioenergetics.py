@@ -62,11 +62,19 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     FCd13 = dict([('June', 18416), ('July', 0), ('August', 4563)])
     HCd13 = dict([('June', 127772), ('July', 0), ('August', 18559)])
     BRd13 = dict([('June', 68449), ('July', 0), ('August', 41233)])
-#Weighted for proportion D. mendotae, D. pulex, and D. rosea/ambigua averaged across available years
-    FCsize = dict([('March',1.207),('April',0.90375),('May',1.073),('June',1.262),('July',1.485),('August',1.633)])
-    HCsize = dict([('March',1.238),('April',1.152),('May',1.058),('June',1.232),('July',1.687),('August',2.005)])
-    LPsize = dict([('March',1.457),('April',0.745),('May',0.871),('June',1.237),('July',1.642),('August',2.033)])
-    BRsize = dict([('March',0.628),('April',0.780),('May',0.827),('June',1.321),('July',1.377),('August',1.282)])
+#Weighted for proportion D. mendotae, D. pulex, and D. rosea/ambigua; 2014 is averaged across 2014 and 2015
+    FCsize16 = dict([('April',0.56),('May',1.01),('June',1.13),('July',1.48),('August',1.78),('September',1.10)])
+    HCsize16 = dict([('April',1.22),('May',1.08),('June',1.16),('July',1.54),('August',1.18),('September',1.51)])
+    LPsize16 = dict([('April',0.53),('May',0.68),('June',1.14),('July',1.31),('August',1.64),('September',1.20)])
+    BRsize16 = dict([('July',1.27)])
+    FCsize15 = dict([('March',1.21),('April',1.25),('May',1.13),('June',1.26),('July',1.49),('August',1.18)])
+    HCsize15 = dict([('March',1.24),('April',1.09),('May',1.03),('June',1.20),('July',1.84),('August',2.21)])
+    LPsize15 = dict([('March',1.46),('April',0.96),('May',1.06),('June',1.35),('July',1.97),('August',2.07)])
+    BRsize15 = dict([('March',0.63),('April',0.73),('May',0.83),('June',1.50),('July',1.48),('August',1.25)])
+    FCsize14 = dict([('March',1.207),('April',0.90375),('May',1.073),('June',1.262),('July',1.485),('August',1.633)])
+    HCsize14 = dict([('March',1.238),('April',1.152),('May',1.058),('June',1.232),('July',1.687),('August',2.005)])
+    LPsize14 = dict([('March',1.457),('April',0.745),('May',0.871),('June',1.237),('July',1.642),('August',2.033)])
+    BRsize14 = dict([('March',0.628),('April',0.780),('May',0.827),('June',1.321),('July',1.377),('August',1.282)])
 
     if Light == None and Site =='Fall Creek' and Year == '2016':
         Light = FCk16[Month]
@@ -105,13 +113,26 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
         Total_Daphnia = HCd14[Month]
     elif Total_Daphnia == None and Site  == 'Lookout Point' and Year == '2014':
         Total_Daphnia = LPd14[Month]
+        
+    if DaphSize == None and Site =='Fall Creek' and Year == '2016':
+        DaphSize = FCsize16[Month]
+    elif DaphSize == None and Site =='Hills Creek' and Year == '2016':
+        DaphSize = HCsize16[Month]
+    elif DaphSize == None and Site  == 'Lookout Point' and Year == '2016':
+        DaphSize = LPsize16[Month]
+    elif DaphSize == None and Site =='Fall Creek' and Year == '2015':
+        DaphSize = FCsize15[Month]
+    elif DaphSize == None and Site =='Hills Creek' and Year == '2015':
+        DaphSize = HCsize15[Month]
+    elif DaphSize == None and Site  == 'Lookout Point' and Year == '2015':
+        DaphSize = LPsize15[Month]
+    elif DaphSize == None and Site  =='Fall Creek' and Year == '2014':
+        DaphSize = FCsize14[Month]
+    elif DaphSize == None and Site =='Hills Creek' and Year == '2014':
+        DaphSize = HCsize14[Month]
+    elif DaphSize == None and Site  == 'Lookout Point' and Year == '2014':
+        DaphSize = LPsize14[Month]      
 
-    if DaphSize == None and Site  =='Fall Creek':
-        DaphSize = FCsize[Month]
-    elif DaphSize == None and Site  =='Hills Creek':
-        DaphSize = HCsize[Month]
-    elif DaphSize == None and Site  == 'Lookout Point':
-        DaphSize = LPsize[Month]
     return Light,Total_Daphnia,DaphSize
 
 def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
