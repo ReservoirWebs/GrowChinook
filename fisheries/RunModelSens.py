@@ -51,6 +51,7 @@ if form.getvalue('tempr') == 'yes':
 else:
     tempr_flag = 'NO'
 Elev = form.getvalue('Elev')
+PSite = form.getvalue('ESite')
 Total_Daphnia = form.getvalue('Total_Daphnia_Input_Name')
 if Total_Daphnia != None:
     Total_Daphnia = float(Total_Daphnia)
@@ -110,7 +111,7 @@ print ('<title>Here are Your Results.</title>')
 print ('</head>')
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev)
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite)
 BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
 
 largestout = 0.0
@@ -127,20 +128,20 @@ csvheaders=[[] for i in range(11)]
 if form.getvalue('Sparam_Range') != None:
     Sparam_Range = float(form.getvalue('Sparam_Range'))
 else:
-   Sparam_Range = 0.75
+   Sparam_Range = 100
 SensParam = form.getvalue('Sens_Param')
 SensFactors = Sensitivity_Expand(Sparam_Range, SensFactors)
 
 if SensParam == 'Starting Mass':
     Sparam = StartingMass
     for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) < .2:
+        if (Sparam * SensFactors[i]) < .02:
             SensInputs.append(.00001)
         else:
-            SensInputs.append(Sparam * SensFactors[i] + Sparam)
+            SensInputs.append(Sparam * SensFactors[i])
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Starting Mass",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
+        batches.append(Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(results[i][0]['growth'][29])
         SensOutPerD1.append(results[i][0]['growth'][0])
@@ -151,13 +152,13 @@ if SensParam == 'Starting Mass':
 elif SensParam == 'Total Daphnia':
     Sparam = Total_Daphnia
     for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) > 0:
-            SensInputs.append(Sparam * SensFactors[i] + Sparam)
+        if (Sparam * SensFactors[i]) > .02:
+            SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Total Daphnia",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, DaphSize, SensInputs[i], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
+        batches.append(Batch(Site, Month, Year, Light, DaphSize, SensInputs[i], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -168,13 +169,13 @@ elif SensParam == 'Total Daphnia':
 elif SensParam == 'Daphnia Size':
     Sparam = DaphSize
     for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) > 0:
-            SensInputs.append(Sparam * SensFactors[i] + Sparam)
+        if (Sparam * SensFactors[i]) > .02:
+            SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Daphnia Size",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
+        batches.append(Batch(Site, Month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -184,13 +185,13 @@ elif SensParam == 'Daphnia Size':
 elif SensParam == 'Light':
     Sparam = Light
     for i in range(11):
-        if (Sparam * SensFactors[i] + Sparam) > 0:
-            SensInputs.append(Sparam * SensFactors[i] + Sparam)
+        if (Sparam * SensFactors[i]) > .02:
+            SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("LEC(K)",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
+        batches.append(Batch(Site, Month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))

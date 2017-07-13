@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 import pylab,glob,os,time
 from numpy import *
 from scipy.interpolate import interp1d
@@ -16,15 +17,39 @@ def Scruffy(): #Scruffy's the janitor. Kills any output files older than one hou
         if (time.time() - age) >= 3600:
             os.remove(file)
 
-def GetSustainEst(Elevation,Total_Daphnia,Consumed):
-    Elevation = (int(Elevation)/3.281)
-    if Elevation > 254:
-        Elevation = 254
-    elif Elevation < 209:
-        Elevation = 209
-    Elevation = str(Elevation)
-    FallCreekBath = dict([('254',7172409.8),('253',6983192.2),('252',6794680.6),('251',6606033.7),('250',6408580.1),('249',6192611.9),('248',5959985.2),('247',5721028.5),('246',5504466.9),('245',5295291.9),('244',5093574.5),('243',4885259.6),('242',4691561.0),('241',4480284.8),('240',4263365.1),('239',4063772.1),('238',3881897.4),('237',3701318.7),('236',3542155.0),('235',3401037.1),('234',3253419.4),('233',3111623.4),('232',2964049.1),('231',2826196.4),('230',2708579.2),('229',2580283.9),('228',2460461.6),('227',2362731.2),('226',2250987.7),('225',2099456.6),('224',1976720.7),('223',1826783.5),('222',1675439.7),('221',1551214.6),('220',1388328.5),('219',1239093.6),('218',1098432.7),('217',938778.8),('216',794499.8),('215',681568.4),('214',543763.1),('213',418760.8),('212',283958.6),('211',118359.2),('210',58565.3),('209',22749.4)])
-    Area = FallCreekBath[Elevation]
+def GetSustainEst(Elevation,Total_Daphnia,Consumed,Site):
+    FallCreekBath = dict([(254,7172409.8),(253,6983192.2),(252,6794680.6),(251,6606033.7),(250,6408580.1),(249,6192611.9),(248,5959985.2),(247,5721028.5),(246,5504466.9),
+                          (245,5295291.9),(244,5093574.5),(243,4885259.6),(242,4691561.0),(241,4480284.8),(240,4263365.1),(239,4063772.1),(238,3881897.4),(237,3701318.7),
+                          (236,3542155.0),(235,3401037.1),(234,3253419.4),(233,3111623.4),(232,2964049.1),(231,2826196.4),(230,2708579.2),(229,2580283.9),(228,2460461.6),
+                          (227,2362731.2),(226,2250987.7),(225,2099456.6),(224,1976720.7),(223,1826783.5),(222,1675439.7),(221,1551214.6),(220,1388328.5),(219,1239093.6),
+                          (218,1098432.7),(217,938778.8),(216,794499.8),(215,681568.4),(214,543763.1),(213,418760.8),(212,283958.6),(211,118359.2),(210,58565.3),(209,22749.4)])
+    HillsCreekBath = dict([(471,11824152.0),(470,11047957.0),(469,10750052.5),(468,10549647.4),(467,10392555.1),(466,10245954.3),(465,10103590.2),(464,9962580.5),
+                         (463,9785023.2),(462,9628472.9),(461,9474124.9),(460,9321650.9),(459,9159198.1),(458,8939366.8),(457,8796908.3),(456,8692717.7),(455,8595332.3),(454,8498339.7),
+                         (453,8400733.9),(452,8300261.2),(451,8186801.7),(450,8076250.7),(449,7960386.1),(448,7845000.3),(447,7732750.2),(446,7622900.1),(445,7516259.1),(444,7410173.9),
+                         (443,7295599.5),(442,7172737.4),(441,7031420.2),(440,6874868.7)])
+    LookoutPointBath = dict([(284,17400404.4),(283,17166452.4),(282,16909609.7),(281,16656200.9),(280,16428387.1),(279,16198459.9),(278,15962451.2),(277,15710603.9),(276,15438675.4),
+                             (275,15158432.8),(274,14900078.0),(273,14645972.9),(272,14406027.0),(271,14180343.4),(270,13818572.5),(269,13439550.0),(268,13077389.3),(267,12768288.0),
+                             (266,12460430.5),(265,12182404.0),(264,11886849.2),(263,11553022.2),(262,11192838.5),(261,10892781.0),(260,10575345.2),(259,10289234.1),(258,10017037.5),
+                             (257,9693452.9),(256,9408823.3),(255,9132615.7),(254,8858337.4),(253,8487078.9),(252,7808404.0),(251,7401582.9),(250,7177361.1)])
+    if Site == 'Fall Creek':
+        if Elevation > 254:
+            Elevation = 254
+        elif Elevation < 209:
+            Elevation = 209
+        Area = FallCreekBath[Elevation]
+    if Site == 'Hills Creek':
+        if Elevation > 471:
+            Elevation = 471
+        elif Elevation < 440:
+            Elevation = 440
+        Area = HillsCreekBath[Elevation]
+    if Site == 'Lookout Point':
+        if Elevation > 284:
+            Elevation = 284
+        elif Elevation < 250:
+            Elevation = 250
+        Area = LookoutPointBath[Elevation]
+    
     Consumable = (Area*Total_Daphnia*0.58)
     PopEst = Consumable/(Consumed*4)
     return PopEst
@@ -62,7 +87,7 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     FCd13 = dict([('June', 18416), ('July', 0), ('August', 4563)])
     HCd13 = dict([('June', 127772), ('July', 0), ('August', 18559)])
     BRd13 = dict([('June', 68449), ('July', 0), ('August', 41233)])
-#Weighted for proportion D. mendotae, D. pulex, and D. rosea/ambigua; 2014 is averaged across 2014 and 2015
+#Weighted for proportion D. mendotae, D. pulex, and D. rosea/ambigua averaged across available years
     FCsize16 = dict([('April',0.56),('May',1.01),('June',1.13),('July',1.48),('August',1.78),('September',1.10)])
     HCsize16 = dict([('April',1.22),('May',1.08),('June',1.16),('July',1.54),('August',1.18),('September',1.51)])
     LPsize16 = dict([('April',0.53),('May',0.68),('June',1.14),('July',1.31),('August',1.64),('September',1.20)])
@@ -113,7 +138,7 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
         Total_Daphnia = HCd14[Month]
     elif Total_Daphnia == None and Site  == 'Lookout Point' and Year == '2014':
         Total_Daphnia = LPd14[Month]
-        
+
     if DaphSize == None and Site =='Fall Creek' and Year == '2016':
         DaphSize = FCsize16[Month]
     elif DaphSize == None and Site =='Hills Creek' and Year == '2016':
@@ -131,21 +156,21 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     elif DaphSize == None and Site =='Hills Creek' and Year == '2014':
         DaphSize = HCsize14[Month]
     elif DaphSize == None and Site  == 'Lookout Point' and Year == '2014':
-        DaphSize = LPsize14[Month]      
-
+        DaphSize = LPsize14[Month]
     return Light,Total_Daphnia,DaphSize
 
 def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
-    step_size = Sparam_Range/500
-    Sparam_Range = (Sparam_Range/100)*-1
-    for i in range(0,11):
+    step_size = Sparam_Range/2000
+    Sparam_Range = 0
+    for i in range(0,20):
         Sparam_Exp.append(Sparam_Range)
         Sparam_Range = Sparam_Range + step_size
+    print(Sparam_Exp)
     return Sparam_Exp
 
 
 class Batch:
-    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elevation):
+    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elevation,PSite):
         self.Site = Site
         self.Month = Month
         self.Year = Year
@@ -174,7 +199,14 @@ class Batch:
         self.out = {}
         self.DaphWeightdry = (exp(1.468 + 2.83 * log(self.DaphSize))) / 1000000  # Based of Cornell equation (g) #WetDaphWeight <- DaphWeight*(8.7/0.322) #From Ghazy, others use ~10%
         self.DaphWeight = self.DaphWeightdry * 8.7 / 0.322
-        self.Elevation = Elevation
+        if Elevation == None:
+            self.Elevation = 1000
+        else:
+            self.Elevation = int(float(Elevation)/3.281)
+        self.PSite = PSite
+        if self.PSite == None:
+            self.PSite = self.Site
+               
         
         if self.DYear == None:
             self.DYear = self.Year
@@ -188,7 +220,7 @@ class Batch:
         self.digestibility = [0.174]  # Noue and Choubert 1985 suggest Daphnia are 82.6% digestible by Rainbow Trout
         self.preyenergy = [DaphEnergy]
 
-        with open('Daphnia VD 2015.csv') as fid:
+        with open('Daphnia VD.csv') as fid:
             reader = DictReader(fid)
             zooplankton_data = [r for r in reader]
         (self.daphline, self.daph_auc) = self.compute_daphniabydepth(zooplankton_data)
@@ -234,7 +266,12 @@ class Batch:
 
     def compute_daphniabydepth(self, zooplankton_data):
         # get rows for site, season, depth
-        rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
+        if self.Year == '2016':
+            rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
+                                                and r['Month'] == self.DMonth
+                                                and r['Year'] == '2016')]
+        else:
+            rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
                                                 and r['Month'] == self.DMonth
                                                 and r['Year'] == '2015')]
         x = [float(r['Depth']) for r in rows]
@@ -459,7 +496,7 @@ class Batch:
             if growth > 0:
                 self.StartingLength = (self.StartingMass / 0.000004) ** (1 / 3.1776) # From LP and FC screw trap data (R2 = 0.9933)
                 #self.StartingLength = (self.StartingMass / 0.0003) ** (1 / 2.217)  # weight to fork length (MacFarlane and Norton 2008)
-                    #Checked fish lengths against this and by end of summer fish weigh much less than they 'should' based on their length
+                #Checked fish lengths against this and by end of summer fish weigh much less than they 'should' based on their length
             
             self.out['Year'].append(self.Year)
             self.out['Site'].append(self.Site)
@@ -475,8 +512,10 @@ class Batch:
             self.out['StartingLength'].append(self.StartingLength)
             dtfinal = self.day_temp
             ntfinal = self.night_temp
-
-        PopEst = GetSustainEst(self.Elevation,self.TotalDaphnia,dailyconsume)
+        
+        ele = self.Elevation-int(day_depth)
+        daph = self.daphline(day_depth)
+        PopEst = GetSustainEst(ele,daph,dailyconsume,self.PSite)
         condition = float(100*(self.StartingMass-self.SMass)*((self.StartingLength/10)**(-3.0)))
         return (self.out, dailyconsume,condition,condition1,dtfinal,ntfinal,PopEst)
 

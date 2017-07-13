@@ -99,9 +99,9 @@ if Scenario == 'CM':
     Year = '2014'
     DYear = '2014'
     TYear = '2014'
-    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(Site, Month, Year)
+    TempCurve = '{0}_T_{1}_{2}.csv'.format(Site, Month, Year)
     if Site == 'Fall Creek':
-        TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Hills Creek', form.getvalue('Month1'), Year)
+        TempCurve = '{0}_T_{1}_{2}.csv'.format('Hills Creek', form.getvalue('Month1'), Year)
         TYear = '2014'
         Light,Total_Daphnia2,DaphSize2 = GetVals(Light,Total_Daphnia,DaphSize,'Hills Creek',Month,'2014')
         print(Light)
@@ -109,18 +109,16 @@ if Scenario == 'CM':
         TSite = 'Hills Creek'
         Light2,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
         
-elif Scenario == 'WSBDD':
-    Year = '2014'
-    DYear = '2014'
-    TYear = '2014'
-    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format('Fall Creek', form.getvalue('Month1'), Year)
-    TYear = '2014'
+elif Scenario == 'WSBDD': #Uses user selection for Daphnia data, Fall Creek 2016 for light and temp
+    TYear = '2016'
+    TempCurve = '{0}_T_{1}_{2}.csv'.format('Fall Creek', form.getvalue('Month1'), '2016')
+    TYear = '2016'
     TMonth = Month
     TSite = 'Fall Creek'
     Light = None
     Total_Daphnia = None
     DaphSize = None
-    Light,Total_Daphnia2,DaphSize2 = GetVals(Light,Total_Daphnia,DaphSize,'Fall Creek',Month,Year)
+    Light,Total_Daphnia2,DaphSize2 = GetVals(Light,Total_Daphnia,DaphSize,'Fall Creek',Month,'2016')
     Light2,Total_Daphnia, DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
     
 elif Scenario == 'STD':
@@ -154,11 +152,11 @@ else:
     Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 
 if TempCurve == None:
-    TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(Site, Month, Year)
+    TempCurve = '{0}_T_{1}_{2}.csv'.format(Site, Month, Year)
 DYear = '2015' #remove once 2014 plankton data added
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 print(Light,Total_Daphnia,DaphSize)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,None,None)
 BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
 '''
 except:    
@@ -322,99 +320,59 @@ print('''
 <body>
     <h2>Enter Values to GrowChinook</h2>
     <div id="formwrap">
-        <form action="RunModel.py" method="post" target="_blank">
-           <b>First, enter a Starting Mass for the fish. Then select a default Year, Month, and Site, which will be used to fill in any fields you may choose to leave blank.
+        <b>First, enter a Starting Mass for the fish. Then select a default Year, Month, and Site, which will be used to fill in any fields you may choose to leave blank.
            Now you may adjust any values you like, and can at any time reassert the default values for your selected Year, Month, and Site by clicking the "Apply Observed Values" button.</b><br><br>
-           <div id="sec1">
                 <label>Enter Fish Starting Mass (g):</label><input type="text" name="Starting_Mass_In" id="SMass_TextInID"  oninput="SMassSlide.value = SMass_TextInID.value"> <br><br>
-                <p style="text-align:center;width:80%;"><b>Select a Year, Month, and Site to fill Daphnia Density, Daphnia Size, and Light Extinction Coefficient with Observed Values</b>
+                
+        <p style="text-align:center;width:80%;"><b>Select a Scenario</b>
+        <select name="Scene" value="" id="ddscene" onclick="configureSceneMonths(this,document.getElementById('ddm1'))">
+                        <option value=""></option>
+                        <option value="CM">Conventional Management</option>
+                        <option value="WSBDD">Winter Stream Bed Drawdown</option>
+                        <option value="STD">Short-Term Drought or Drawdown for Repairs</option>
+                        <option value="MYD">Multi-Year Drought</option>
+                        <option value="WWP2015">Warm-water Predators 2015</option>
+                        <option value="IP22015">Increased Productivity 2015 (2x)</option>
+                        <option value="IP102015">Increased Productivity 2015 (10x)</option>
+                        <option value="DR">Delayed Refill</option>
+        </select>
+        <p style="text-align:center;width:80%;"><b>Select a Year, Month, and Site to fill Daphnia Density, Daphnia Size, and Light Extinction Coefficient with Observed Values</b>
                 <div style="margin:auto;">
-                <label class="dd">Year:</label> <select name="Year" value="2015" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
+                    <label class="dd">Site:</label>
+                    <select name="Site" value="" id="dds">
+                        <option value=""></option>
+                        <option value="Fall Creek">Fall Creek</option>
+                        <option value="Hills Creek">Hills Creek</option>
+                        <option value="Lookout Point">Lookout Point</option>
+                    </select>
+                    <label class="dd">Month:</label>
+                    <select name="Month1" value="" id="ddm1" onchange="getDefaultValuesScene(document.getElementById('ddscene'),document.getElementById('ddy'),document.getElementById('ddm1'),document.getElementById('dds'),document.getElementById('SMass_TextInID'),document.getElementById('TotDDef'),document.getElementById('DaphSDef'),document.getElementById('LightDef'));
+                                                                       getDefaultValuesScene(document.getElementById('ddscene'),document.getElementById('ddy'),document.getElementById('ddm1'),document.getElementById('dds'),document.getElementById('SMass_TextInID'),document.getElementById('TotDTextInID'),document.getElementById('DaphSTextInID'),document.getElementById('LightTextInID'));">
                     <option value=""></option>
-                    <option value="2015">2015</option>
-                    <option value="2014">2014</option>
-                    
-                </select>
-
-                <label class="dd">Site:</label> <select name="Site" value="Fall Creek" id="dds">
-                </select>
-
-                <label class="dd">Month:</label> <select name="Month1" value="June" id="ddm1" onchange="configureMonthDropDowns(this,document.getElementById('ddm2'))">
-                </select>
-                <br>
-                </div>
-                <div style="text-align:center;"><button type="button" onclick="getDefaultValues(document.getElementById('ddy'),document.getElementById('ddm1'),document.getElementById('dds'),document.getElementById('SMass_TextInID'),document.getElementById('TotDDef'),document.getElementById('DaphSDef'),document.getElementById('LightDef'));
-                getDefaultValues(document.getElementById('ddy'),document.getElementById('ddm1'),document.getElementById('dds'),document.getElementById('SMass_TextInID'),document.getElementById('TotDTextInID'),document.getElementById('DaphSTextInID'),document.getElementById('LightTextInID'));">Apply Observed Values</button></div>
-                <br>
-
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                    </select><br>
+                
                 Observed:<input class="defdisp" type="text" name="TotDDef" id="TotDDef" value="" readonly><label>Daphnia Density (per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
-
-                Observed:<input class="defdisp" type="text" name="LightDef" id="LightDef" value="" readonly><label>Light Extinction Coefficient</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
-
-
+                Observed:<input class="defdisp" type="text" name="LightDef" id="LightDef" value="" readonly><label>Light Extinction Coefficient (Higher is Darker)</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                 Observed:<input class="defdisp" type="text" name="DaphSDef" id="DaphSDef" value="" readonly><label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
+                            </div>
 
-                <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict depth</b></div>
-                <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
-                <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
-                </div>
-
-            </div>
-            <div id="sec2">
-                <div style="display:inline-block;">
-                <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
-                <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Temperature:</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
-                <label class="deptem">Minimum Temperature:</label><input class="deptem" type="text" name="TminIn" id="TminInID">
-                </div>
-                </div>
-                <div><br></div>
-
-
-                <div style="width:80%;"><b>Optional: Select a Year, Month, and Site to apply the corresponding Daphnia distribution curve. Otherwise, the curve corresponding to the Default Year, Month, and Site will be used.</b>
-                <label class="dd">Daphnia Year:</label> <select name="DYear" id="dddy" onchange="configureDropDownLists(this,document.getElementById('dddm'),document.getElementById('ddds'))">
-                    <option value=""></option>
-                    <option value="2015">2015</option>
-                    <option value="2014">2014</option>
-                    <option value="2013">2013</option>
-                </select>
-
-                <label class="dd">Daphnia Site:</label> <select name="DSite" id="ddds">
-                </select>
-
-                <label class="dd">Daphnia Month:</label> <select name="DMonth" id="dddm">
-                </select>
-<div><br></div>
-                <div style="margin-top:auto;width:80%;"><b>Optional: Select a Year, Month, and Site to apply the corresponding Daphnia distribution curve. Otherwise, the curve corresponding to the Default Year, Month, and Site will be used.</b>
-                <label class="dd">Temperature Year:</label> <select name="TYear" id="ddty"  onchange="configureDropDownLists(this,document.getElementById('ddtm'),document.getElementById('ddts'))">
-                    <option value=""></option>
-                    <option value="2015">2015</option>
-                    <option value="2014">2014</option>
-                    <option value="2013">2013</option>
-                </select>
-
-                <label class="dd">Temperature Site:</label> <select name="TSite" id="ddts">
-                </select>
-
-                <label class="dd">Temperature Month:</label> <select name="TMonth" id="ddtm">
-                </select>
-                <br>
-                <br>
-                <br>
-        </div>
             <div style="display:inline-block;margin:auto;width:75%">
-                <div style="float:left;">
+                
+            <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
-                </div><br>
-                <div id="subutt" style="float:right;">
+            </div><br>
+            <div id="subutt" style="float:right;">
                     <input type="submit" value="Submit"/>
                 </div>
-                
-            </div><br>
-        </form>
-    </div>
+        </div>
+    </form>
 </body>
 ''' .format(fname))
 print ('</html>')

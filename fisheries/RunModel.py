@@ -112,8 +112,11 @@ if tempr_flag == 'YES':
         Tmax = Tmax+1
 else:
     Tmin,Tmax = -1,1000
-    
+
+PSite = form.getvalue('ESite')
 Elev = form.getvalue('Elev')
+if Elev == None:
+    Elev = 10000
 DYear = form.getvalue('DYear')
 if DYear == None:
     DYear = Year
@@ -164,7 +167,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 try:
-    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev)
+    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite)
     BaseResults,DConsumed,condition,condition1,daytemp,nighttemp,PopEst  = FreshBatch.Run_Batch()
 except:    
     #print ('Content-Type: text/html')
@@ -297,10 +300,10 @@ print ('''
                     <div class="dataright">%.0f</div>
                 </div>
                 <div class="dataleft">Estimated Condition Change:
-                <div class="dataright">%.2f</div>
+                <div class="dataright">%+.2f</div>
                 </div>
-                <div class="dataleft">Population Estimate:
-                <div class="dataright">%.2f</div>
+                <div class="dataleft">Population at which Density Dependent Interactions Expected:
+                <div class="dataright">%i</div>
                 </div>
             </div>
 
@@ -367,9 +370,9 @@ print('''
                     <b>Optional: Set to restrict depth</b>
                 </div>
                 <div style="float:right;width:70%;">
-                    <label class="deptem">Maximum Depth:</label>
+                    <label class="deptem">Maximum Depth (m):</label>
                     <input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
-                    <label class="deptem">Minimum Depth:</label>
+                    <label class="deptem">Minimum Depth (m):</label>
                     <input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
             </div>
@@ -379,9 +382,9 @@ print('''
                         <b>Optional: Set to restrict temperature</b>
                     </div>
                     <div style="float:right;width:70%;">
-                        <label class="deptem">Maximum Temperature:</label>
+                        <label class="deptem">Maximum Temperature (Celsius):</label>
                         <input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
-                        <label class="deptem">Minimum Temperature:</label>
+                        <label class="deptem">Minimum Temperature (Celsius):</label>
                         <input class="deptem" type="text" name="TminIn" id="TminInID">
                     </div>
                 </div>
@@ -392,6 +395,7 @@ print('''
                     <label class="dd">Daphnia Year:</label>
                     <select name="DYear" id="dddy" onchange="configureDropDownLists(this,document.getElementById('dddm'),document.getElementById('ddds'))">
                         <option value=""></option>
+                        <option value="2016">2016</option>
                         <option value="2015">2015</option>
                         <option value="2014">2014</option>
                     </select>
@@ -408,6 +412,7 @@ print('''
                         <label class="dd">Temperature Year:</label>
                         <select name="TYear" id="ddty"  onchange="configureDropDownLists(this,document.getElementById('ddtm'),document.getElementById('ddts'))">
                             <option value=""></option>
+                            <option value="2016">2016</option>
                             <option value="2015">2015</option>
                             <option value="2014">2014</option>
                         </select>
@@ -430,9 +435,18 @@ print('''
                 <div id="subutt" style="float:right;">
                     <input type="submit" value="Submit"/>
                 </div>
+            <div>Select Site for Population Estimate
+            <select name="ESite" id="ddes">
+                        <option value=""></option>
+                        <option value="Fall Creek">Fall Creek</option>
+                        <option value="Hills Creek">Hills Creek</option>
+                        <option value="Lookout Point">Lookout Point</option>
+                    </select>
+            </div>
+            <br>
             <div style="float:left;">
-                <label>Enter Elevation:</label>
-                <input type="text" style="width:50%;" name="Elev" id="ElevID">
+                <label>Enter Elevation for Population Estimate (ft):</label>
+                <input type="text" style="width:25%;" name="Elev" id="ElevID">
             </div><br>
         </div>
     </form>
@@ -440,10 +454,11 @@ print('''
                         <a href="/TemperatureTemplate.csv" download>Temperature Template</a>
     <form action = "/upload.py" method="POST" enctype="multipart/form-data">
     <input type="file" name="filename">
-    <input type="submit">
+    <input type="submit" value="Upload">
     </form>
                     </div>
     <br>
+
 </body>
 ''' .format(fname,Year,Site,Month))
 print ('</html>')
