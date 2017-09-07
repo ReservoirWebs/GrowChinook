@@ -11,6 +11,8 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
+#        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 print ('Content-type:text/html\r\n\r\n')
 print('<html>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
@@ -23,11 +25,11 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 <body>
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -42,7 +44,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                <label class="dd">Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
                     <option value=""></option>
                     <option value="2015">2015</option>
-                    <option value="2014">2014</option>
+
                     
                </select>
 

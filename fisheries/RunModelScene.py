@@ -23,7 +23,9 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
-Scruffy()
+cwd=os.getcwd()
+Scruffy(cwd,cwd,'output*')
+Scruffy('uploads',cwd,'*')
 cgitb.enable()
 form = cgi.FieldStorage()
 title=form.getvalue('TabName')
@@ -88,11 +90,13 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
+
+#        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
 
 Scenario=form.getvalue('Scene')
 if Scenario == 'CM':
@@ -156,7 +160,7 @@ if TempCurve == None:
 DYear = '2015' #remove once 2014 plankton data added
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 print(Light,Total_Daphnia,DaphSize)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,None,None)
+FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,None,None,None)
 BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
 '''
 except:    
