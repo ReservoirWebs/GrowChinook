@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use('Agg')
 import sys
 import csv
-from Bioenergetics_Mult import *
+from Bioenergetics2 import *
 import cgi, cgitb
 import pylab
 import io
@@ -59,22 +59,35 @@ fig=pyplot.figure(facecolor='#c8e9b1')
 fig.suptitle('Juvenile Spring Chinook', fontsize=20)
 massax = fig.add_subplot(221)
 Mass = StartingMass
-for i in range(Mon, (Mon2+1)):
-    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Months[i],Year)
-    batches.append(Batch(Site, Months[i], Year, Light, DaphSize, Total_Daphnia, Mass, 1000, -1, 1000,-1,"None_smoothed_None_None.csv",None,None,None))
-    dd,nd,g,mass,length = (batches[z].Run_Batch())
-    Mass = mass[29]
-    for x in g:
-        growths.append(x)
-    for x in mass:
-        masses.append(x)
-    for x in dd:
-        dds.append(x)
-    for x in nd:
-        nds.append(x)
-    Light,Total_Daphnia,DaphSize = (None,None,None)
-    z = z+1
-
+try:
+    for i in range(Mon, (Mon2+1)):
+        Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Months[i],Year)
+        batches.append(Batch(Site, Months[i], Year, Light, DaphSize, Total_Daphnia, Mass, 1000, -1, 1000,-1,"None_smoothed_None_None.csv",None,None,None))
+        dd,nd,g,mass,length = (batches[z].Run_Batch())
+        Mass = mass[29]
+        for x in g:
+            growths.append(x)
+        for x in mass:
+            masses.append(x)
+        for x in dd:
+            dds.append(x)
+        for x in nd:
+            nds.append(x)
+        Light,Total_Daphnia,DaphSize = (None,None,None)
+        z = z+1
+except:    
+    print ('Content-Type: text/html')
+    print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
+    print ('<html>')
+    print ('<head>')
+    print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
+    print ('<title>You are going to be redirected</title>')
+    print ('</head>') 
+    print ('<body>')
+    print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
+    print ('</body>')
+    print ('</html>')
+    gitb.handler()
 
 	
 print ('Content-type:text/html\r\n\r\n')
@@ -90,16 +103,17 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 <body>
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
         
     </ul>''')
+#        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 massax.plot(masses, label="Mass (g)")
 massax.set_ylabel('Mass (g)')
 massax.set_xlabel('Day')

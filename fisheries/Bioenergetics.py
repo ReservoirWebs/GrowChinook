@@ -10,12 +10,14 @@ from collections import defaultdict
 from matplotlib import pyplot
 from datetime import datetime, timedelta
 
-def Scruffy(): #Scruffy's the janitor. Kills any output files older than one hour
-    for file in glob.glob("output*"):
-        st=os.stat(file)    
-        age=st.st_mtime
-        if (time.time() - age) >= 3600:
+def Scruffy(path,returnpath,name): #Scruffy's the janitor. Kills any output files older than one hour
+    os.chdir(path)
+    for file in glob.glob("{}*".format(name)):
+        filestats=os.stat(file)
+        age=filestats.st_mtime
+        if (time.time()-age) >= 3600:
             os.remove(file)
+    os.chdir(returnpath)
 
 def GetSustainEst(Elevation,Total_Daphnia,Consumed,Site):
     FallCreekBath = dict([(254,7172409.8),(253,6983192.2),(252,6794680.6),(251,6606033.7),(250,6408580.1),(249,6192611.9),(248,5959985.2),(247,5721028.5),(246,5504466.9),
@@ -23,14 +25,27 @@ def GetSustainEst(Elevation,Total_Daphnia,Consumed,Site):
                           (236,3542155.0),(235,3401037.1),(234,3253419.4),(233,3111623.4),(232,2964049.1),(231,2826196.4),(230,2708579.2),(229,2580283.9),(228,2460461.6),
                           (227,2362731.2),(226,2250987.7),(225,2099456.6),(224,1976720.7),(223,1826783.5),(222,1675439.7),(221,1551214.6),(220,1388328.5),(219,1239093.6),
                           (218,1098432.7),(217,938778.8),(216,794499.8),(215,681568.4),(214,543763.1),(213,418760.8),(212,283958.6),(211,118359.2),(210,58565.3),(209,22749.4)])
-    HillsCreekBath = dict([(471,11824152.0),(470,11047957.0),(469,10750052.5),(468,10549647.4),(467,10392555.1),(466,10245954.3),(465,10103590.2),(464,9962580.5),
-                         (463,9785023.2),(462,9628472.9),(461,9474124.9),(460,9321650.9),(459,9159198.1),(458,8939366.8),(457,8796908.3),(456,8692717.7),(455,8595332.3),(454,8498339.7),
-                         (453,8400733.9),(452,8300261.2),(451,8186801.7),(450,8076250.7),(449,7960386.1),(448,7845000.3),(447,7732750.2),(446,7622900.1),(445,7516259.1),(444,7410173.9),
-                         (443,7295599.5),(442,7172737.4),(441,7031420.2),(440,6874868.7)])
+    HillsCreekBath = dict([(471,11824152),(470,11047957.049493),(469,10750052.54073),(468,10549647.44042),(467,10392555.06144),(466,10245954.336836),(465,10103590.19064),
+                           (464,9962580.4830269),(463,9785023.1680155),(462,9628472.87269),(461,9474124.8705419),(460,9321650.9021462),(459,9159198.0694872),(458,8939366.7883381),
+                           (457,8796908.3291961),(456,8692717.7107324),(455,8595332.2660972),(454,8498339.7299929),(453,8400733.8727871),(452,8300261.1956348),(451,8186801.6824173),
+                           (450,8076250.7269541),(449,7960386.1386497),(448,7845000.3433575),(447,7732750.2485334),(446,7622900.1399753),(445,7516259.1352595),(444,7410173.8915678),
+                           (443,7295599.4899665),(442,7172737.4185207),(441,7031420.1952124),(440,6874868.70297),(439,6718317.2107276),(438,6561765.7184852),(437,6405214.2262428),
+                           (436,6248662.7340004),(435,6092111.241758),(434,5935559.7495156),(433,5779008.2572732),(432,5622456.7650308),(431,5465905.2727884),(430,5309353.780546),
+                           (429,5152802.2883036),(428,4996250.7960612),(427,4839699.30381881),(426,4683147.81157641),(425,4526596.31933401),(424,4370044.82709161),(423,4213493.33484921),
+                           (422,4056941.84260681),(421,3900390.35036441),(420,3743838.85812201),(419,3587287.36587961),(418,3430735.87363721),(417,3274184.38139481),(416,3117632.88915241),
+                           (415,2961081.39691001),(414,2804529.90466761),(413,2647978.41242521),(412,2491426.92018281),(411,2334875.42794041),(410,2178323.93569801),(409,2021772.44345561),
+                           (408,1865220.95121321),(407,1708669.45897081),(406,1552117.96672841),(405,1395566.47448601),(404,1239014.98224361),(403,1082463.49000121),(402,925911.997758815),
+                           (401,769360.505516415),(400,612809.013274016),(399,456257.521031616),(398,299706.028789217),(397,143154.536546817),(396,134206.875),(395,125259.75),(394,116312.625),
+                           (393,107365.5),(392,98418.375),(391,89471.25),(390,80524.125),(389,71577),(388,62629.875),(387,53682.75),(386,44735.625),(385,35788.5),(384,26841.375),(383,17894.25),(382,8947.125),(381,0),(380,0)])
     LookoutPointBath = dict([(284,17400404.4),(283,17166452.4),(282,16909609.7),(281,16656200.9),(280,16428387.1),(279,16198459.9),(278,15962451.2),(277,15710603.9),(276,15438675.4),
                              (275,15158432.8),(274,14900078.0),(273,14645972.9),(272,14406027.0),(271,14180343.4),(270,13818572.5),(269,13439550.0),(268,13077389.3),(267,12768288.0),
                              (266,12460430.5),(265,12182404.0),(264,11886849.2),(263,11553022.2),(262,11192838.5),(261,10892781.0),(260,10575345.2),(259,10289234.1),(258,10017037.5),
-                             (257,9693452.9),(256,9408823.3),(255,9132615.7),(254,8858337.4),(253,8487078.9),(252,7808404.0),(251,7401582.9),(250,7177361.1)])
+                             (257,9693452.9),(256,9408823.3),(255,9132615.7),(254,8858337.4),(253,8487078.9),(252,7808404.0),(251,7401582.9),(250,7177361.1),(249,6953139.2659653),
+                             (248,6728917.4626516),(247,6504695.6593379),(246,6280473.8560242),(245,6056252.0527105),(244,5832030.2493968),(243,5607808.4460831),(242,5383586.6427694),
+                             (241,5159364.8394557),(240,4935143.036142),(239,4710921.23282831),(238,4486699.42951461),(237,4262477.62620091),(236,4038255.82288721),(235,3814034.01957351),
+                             (234,3589812.21625981),(233,3365590.41294611),(232,3141368.60963241),(231,2917146.80631871),(230,2692925.00300501),(229,2468703.19969131),(228,2244481.39637761),
+                             (227,2020259.59306391),(226,1796037.78975021),(225,1571815.98643651),(224,1347594.18312281),(223,1123372.37980911),(222,899150.576495413),(221,674928.773181713),
+                             (220,450706.969868014),(219,226485.166554314),(218,2263.36324061453),(217,.0001),(216,.0001),(215,.0001),(214,.0001)])
     if Site == 'Fall Creek':
         if Elevation > 254:
             Elevation = 254
@@ -40,14 +55,14 @@ def GetSustainEst(Elevation,Total_Daphnia,Consumed,Site):
     if Site == 'Hills Creek':
         if Elevation > 471:
             Elevation = 471
-        elif Elevation < 440:
-            Elevation = 440
+        elif Elevation < 380:
+            Elevation = 380
         Area = HillsCreekBath[Elevation]
     if Site == 'Lookout Point':
         if Elevation > 284:
             Elevation = 284
-        elif Elevation < 250:
-            Elevation = 250
+        elif Elevation < 214:
+            Elevation = 214
         Area = LookoutPointBath[Elevation]
     
     Consumable = (Area*Total_Daphnia*0.58)
@@ -160,17 +175,17 @@ def GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year):
     return Light,Total_Daphnia,DaphSize
 
 def Sensitivity_Expand(Sparam_Range, Sparam_Exp):
-    step_size = Sparam_Range/2000
-    Sparam_Range = 0
-    for i in range(0,20):
-        Sparam_Exp.append(Sparam_Range)
-        Sparam_Range = Sparam_Range + step_size
-    print(Sparam_Exp)
+    step_size = (Sparam_Range-100)/1000
+    for i in range(10,1,-1):
+        Sparam_Exp.append(float(1)/i)
+    Sparam_Exp.append(1)
+    for i in range(1,11):
+        Sparam_Exp.append(float(1)+(step_size*i))
     return Sparam_Exp
 
 
 class Batch:
-    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elevation,PSite):
+    def __init__(self, Site, Month, Year, Light, DaphSize, TotalDaphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elevation,PSite,CustDaph):
         self.Site = Site
         self.Month = Month
         self.Year = Year
@@ -187,6 +202,7 @@ class Batch:
         self.Dmin = Dmin
         self.Tmax = Tmax
         self.Tmin = Tmin
+        self.CustDaph = CustDaph
         self.dtfinal = 0
         self.ntfinal = 0
         self.Depths = []
@@ -200,27 +216,30 @@ class Batch:
         self.DaphWeightdry = (exp(1.468 + 2.83 * log(self.DaphSize))) / 1000000  # Based of Cornell equation (g) #WetDaphWeight <- DaphWeight*(8.7/0.322) #From Ghazy, others use ~10%
         self.DaphWeight = self.DaphWeightdry * 8.7 / 0.322
         if Elevation == None:
-            self.Elevation = 1000
+            self.Elevation = 100000
         else:
             self.Elevation = int(float(Elevation)/3.281)
         self.PSite = PSite
         if self.PSite == None:
             self.PSite = self.Site
-               
-        
-        if self.DYear == None:
-            self.DYear = self.Year
-        if self.DMonth == None:
-            self.DMonth = self.Month
-        if self.DSite == None:
-            self.DSite = self.Site
+
+        if self.CustDaph is None:
+            self.CustDaph = 'Daphnia VD.csv'
+            if self.DYear == None:
+                self.DYear = self.Year
+            if self.DMonth == None:
+                self.DMonth = self.Month
+            if self.DSite == None:
+                self.DSite = self.Site
+        else:
+            self.CustDaph = 'uploads/daph/{}'.format(self.CustDaph)
 
         DaphEnergy = 22700  # From Luecke 22.7 kJ/g
         self.prey = [1]
         self.digestibility = [0.174]  # Noue and Choubert 1985 suggest Daphnia are 82.6% digestible by Rainbow Trout
         self.preyenergy = [DaphEnergy]
 
-        with open('Daphnia VD.csv') as fid:
+        with open(self.CustDaph) as fid:
             reader = DictReader(fid)
             zooplankton_data = [r for r in reader]
         (self.daphline, self.daph_auc) = self.compute_daphniabydepth(zooplankton_data)
@@ -237,8 +256,8 @@ class Batch:
         with open(f) as fid:
             reader = DictReader(fid, quoting=QUOTE_NONNUMERIC)
             self.params = next(reader)
-            if self.TempCurve == "None_smoothed_None_None.csv":
-                temperature_file = '{0}_smoothed_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
+            if self.TempCurve == "None_T_None_None.csv":
+                temperature_file = '{0}_T_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
             else:
                 temperature_file = TempCurve
  
@@ -250,7 +269,9 @@ class Batch:
                 if ((float(row['temp']) <= self.Tmax) and (float(row['temp']) >= self.Tmin)):
                     self.temperatures.append(float(row['temp']))
                     self.Depths.append(float(row['depth']))
-
+        if self.temperatures == [] or self.Depths == []:
+            print("ALL DEPTHS EXCLUDED BY TEMPERATURE AND DEPTH RESTRICTIONS!!!!!!!!!")
+        
         self.predatorenergy = self.predatorenergy(self.StartingMass)
         self.depth_from_temp = interp1d(self.temperatures, self.Depths, fill_value=0, bounds_error=False)
         self.temp_from_depth = interp1d(self.Depths, self.temperatures, fill_value=0, bounds_error=False)
@@ -266,7 +287,10 @@ class Batch:
 
     def compute_daphniabydepth(self, zooplankton_data):
         # get rows for site, season, depth
-        if self.Year == '2016':
+        if self.CustDaph is not 'Daphnia VD.csv':
+            rows = [r for r in zooplankton_data]
+
+        elif self.Year == '2016':
             rows = [r for r in zooplankton_data if (r['Site'] == self.DSite
                                                 and r['Month'] == self.DMonth
                                                 and r['Year'] == '2016')]
@@ -383,6 +407,7 @@ class Batch:
         if eq == 1:
             if temperature > RTL:
                 VEL = RK1 * W0 ** RK4
+                print("SOME OF THE INCLUDED TEMPERATURES ARE LETHAL, PLEASE MODIFY THE TEMPERATURE TO EXCLUDE TEMPERATURES OVER 25C!!!!!!!!!!!!!!!")
             else:
                 VEL = ACT * (W0 ** RK4) * exp(BACT * temperature)
                 FTmetabolism = exp(RQ * temperature)

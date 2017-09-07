@@ -16,7 +16,9 @@ from matplotlib.font_manager import FontProperties
 from scipy.interpolate import griddata
 import pandas
 cgitb.enable()
-Scruffy()
+cwd=os.getcwd()
+#Scruffy(cwd,cwd,'output*')
+#Scruffy('uploads',cwd,'*')
 
 address = cgi.escape(os.environ["REMOTE_ADDR"])
 script = "Advanced Sensitivity Run Page"
@@ -35,22 +37,23 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
     month = Month1
     Growths1 = []
     Growths = []
+    csvheaders=[[] for i in range(20)]
     Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,month,Year)
 
     if SensParam == 'Starting Mass':
         Sparam = StartingMass
-        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None)
         results = []
         BaseResults, DConsumed, condition, condition1,dt,nt,PopEst = FreshBatch.Run_Batch()
         batches = []
-        for i in range(11):
-            sensIn = float(Sparam * (SensFactors[i])/100 + Sparam)
+        for i in range(20):
+            sensIn = float(Sparam * (SensFactors[i]))
             if (sensIn < 0.0):
                 SensInputs.append(.0001)
             else:
                 SensInputs.append(sensIn)
             csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Starting Mass", SensInputs[i]))]
-            batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
+            batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None))
             res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
             results.append(res)
             SensOutPer.append(results[i]['growth'][29])
@@ -60,17 +63,17 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
 
     elif SensParam == 'Total Daphnia':
         Sparam = Total_Daphnia
-        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None)
         results = []
         BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
-        for z in range(11):
-            sensIn = float(Sparam * (SensFactors[z]/100) + Sparam)
+        for z in range(20):
+            sensIn = float(Sparam * (SensFactors[z]))
             if (sensIn < 0.0):
                 SensInputs.append(.0001)
             else:    
                 SensInputs.append(sensIn)
-            newbatch = Batch(Site, month, Year, Light, DaphSize, SensInputs[z], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+            newbatch = Batch(Site, month, Year, Light, DaphSize, SensInputs[z], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None)
             csvheaders[z] = [Site, month, Year, ("%s: %f" % ("Total Daphnia", SensInputs[z]))]
             batches.append(newbatch)
             res, taway, condition, condition1,dt,n,PopEst = batches[z].Run_Batch()
@@ -82,66 +85,46 @@ def RunSens(Site, Month1, Month2, Year, Light, DaphSize, Total_Daphnia, Starting
             
     elif SensParam == 'Daphnia Size':
         Sparam = DaphSize
-        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None)
         results = []
         BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
-        for i in range(11):
-            sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
-            if (sensIn > 0.0):    
-                SensInputs.append(sensIn)
-                batches.append(Batch(Site, month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
-                csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Daphnia Size", SensInputs[i]))]
-                res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
-                results.append(res)
-                SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
-                SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
-                Growths.append(results[i]['growth'][29])
-                Growths1.append(results[i]['growth'][0])
+        for i in range(20):
+            sensIn = float(Sparam * (SensFactors[i]))
+            if (sensIn < 0.0):
+                SensInputs.append(.0001)
             else:
-                numskips = numskips + 1
-                SensInputs.append(None)
-                batches.append(None)
-                results.append(None)
-                SensOutPer.append(None)
-                SensOutPerD1.append(None)
-                Growths.append(None)
-                Growths1.append(None)
+                SensInputs.append(sensIn)
+            csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Daphnia Size", SensInputs[i]))]
+            batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None))
+            res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
+            results.append(res)
+            SensOutPer.append(results[i]['growth'][29])
+            SensOutPerD1.append(results[i]['growth'][0])
+            Growths.append(results[i]['growth'][29])
+            Growths1.append(results[i]['growth'][0])
 
     elif SensParam == 'Light':
         Sparam = Light
-        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite)
+        FreshBatch = Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None)
         results = []
         BaseResults, DConsumed, condition, condition1,dt,n,PopEst = FreshBatch.Run_Batch()
         batches = []
-        for i in range(11):
-            sensIn = float(Sparam * (SensFactors[i]/100) + Sparam)
-            if (sensIn > 0.0):    
-                SensInputs.append(sensIn)
-                batches.append(Batch(Site, month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite))
-                csvheaders[i] = [Site, month, Year, ("%s: %f" % ("LEC(k)", SensInputs[i]))]
-                res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
-                results.append(res)
-                SensOutPer.append(100 * ((results[i]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
-                SensOutPerD1.append(100 * ((results[i]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
-                Growths.append(results[i]['growth'][29])
-                Growths1.append(results[i]['growth'][0])
+        for i in range(20):
+            sensIn = float(Sparam * (SensFactors[i]))
+            if (sensIn < 0.0):    
+                SensInputs.append(.0001)
             else:
-                numskips = numskips + 1
-                SensInputs.append(None)
-                batches.append(None)
-                results.append(None)
-                SensOutPer.append(None)
-                SensOutPerD1.append(None)
-                Growths.append(None)
-                Growths1.append(None)
+                SensInputs.append(sensIn)
+            csvheaders[i] = [Site, month, Year, ("%s: %f" % ("Light", SensInputs[i]))]
+            batches.append(Batch(Site, month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite, None))
+            res, taway, condition, condition1,dt,n,PopEst = batches[i].Run_Batch()
+            results.append(res)
+            SensOutPer.append(results[i]['growth'][29])
+            SensOutPerD1.append(results[i]['growth'][0])
+            Growths.append(results[i]['growth'][29])
+            Growths1.append(results[i]['growth'][0])
 
-#    for i in range(len(SensFactors)):
-#        if abs(SensFactors[i]) > abs(largestout):
-#            largestout = abs(SensFactors[i])
-#    for i in range(len(SensOutPer)):
-#        if abs(SensOutPer[i]) > abs(largestout):
-#            largestout = abs(SensOutPer[i])
 
     with open(fname, 'a') as outfile:
         writer = csv.writer(outfile)
@@ -168,6 +151,7 @@ title=form.getvalue('TabName')
 if title == None:
     title="GrowChinook Results"
 Elev = form.getvalue('Elev')
+PSite = form.getvalue('ESite')
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
     StartingMass=float(StartingMass)
@@ -181,7 +165,7 @@ DYear = '2015'
 DMonth = 'June'
 DSite = 'Fall Creek'
 
-TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
+TempCurve = '{0}_T_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
 
 if form.getvalue('defa') == 'yes':
     def_flag = 'YES'
@@ -234,15 +218,18 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 <body>
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>'''.format(title))
+
+#        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 print ('<head>')
 print ('<title>{}</title>'.format(title))
 print ('</head>')
@@ -270,8 +257,6 @@ if form.getvalue('Sparam_Range') != None:
 else:
    Sparam_Range = 1
 SensFactors = Sensitivity_Expand(Sparam_Range, SensFactors)
-for i in range(len(SensFactors)):
-    SensFactors[i] = SensFactors[i] * 100
 
 fig=pyplot.figure(facecolor='#c8e9b1')
 #ax1 = fig.add_subplot(222)
@@ -366,6 +351,7 @@ except:
     #print '  </body>'
     #print '</html>'
     cgitb.handler()
+    
 
 #if SensParam == 'Total Daphnia':
 #    for m in (Months2015):        
@@ -446,58 +432,55 @@ if depr_flag == "YES":
 '''
 
 print('''<div style="display:block; margin-left:auto; margin-right:auto;">Download Full Results?
-                <a href="/cgi-bin/{}" download>Download</a>
+                <a href="/{}" download>Download</a>
             </div>
 '''.format(fname))
 
 print('''
 <script type="text/javascript">
-    function configureDropDownLists(ddy,ddm,dds) {
-    var years = ['2013', '2014', '2015'];
-    var months = ['March', 'April', 'May', 'June', 'July', 'August'];
-    var sites = ['Blue River', 'Fall Creek', 'Hills Creek', 'Lookout Point'];
-    switch (ddy.value) {
-        case '2013':
-            ddm.options.length = 0;
-            createOption(ddm, months[3], months[3]);
-            createOption(ddm, months[5], months[5]);
-            dds.options.length = 0;
-            for (i=0; i<3; i++) {
-                createOption(dds,sites[i],sites[i]);
-            }
-            break;
-        case '2014':
-            ddm.options.length = 0;
-        for (i = 3; i < months.length; i++) {
-            createOption(ddm, months[i], months[i]);
-            }
+    function configureDropDownLists2(ddy,dds) {
+var years = ['2013', '2014', '2015','2016'];
+var sites = ['Blue River', 'Fall Creek', 'Hills Creek', 'Lookout Point'];
+
+switch (ddy.value) {
+    case '2013':
+        dds.options.length = 0;
+        for (i=0; i<3; i++) {
+            createOption(dds,sites[i],sites[i]);
+        }
+        break;
+    case '2014':
+    dds.options.length = 0;
+    for (i=1; i<sites.length; i++) {
+            createOption(dds,sites[i],sites[i]);
+        }
+        break;
+    case '2015':
         dds.options.length = 0;
         for (i=1; i<sites.length; i++) {
-                createOption(dds,sites[i],sites[i]);
-            }
-            break;
-        case '2015':
-            ddm.options.length = 0;
-            for (i = 0; i < months.length; i++) {
-                createOption(ddm, months[i], months[i]);
-            }
-            dds.options.length = 0;
-            for (i=1; i<sites.length; i++) {
-                createOption(dds,sites[i],sites[i]);
-            }
-            break;
-        default:
-            ddm.options.length = 0;
+            createOption(dds,sites[i],sites[i]);
+        }
         break;
+    case '2016':
+        dds.options.length = 0;
+        for (i=1; i<sites.length; i++) {
+            createOption(dds,sites[i],sites[i]);
+        }
+        break;
+    default:
+        dds.options.length = 0;
+    break;
     }
+
 }
-    function createOption(dd, text, value) {
-        var opt = document.createElement('option');
-        opt.value = value;
-        opt.text = text;
-        dd.options.add(opt);
-    }
-</script>
+
+
+function createOption(dd, text, value) {
+    var opt = document.createElement('option');
+    opt.value = value;
+    opt.text = text;
+    dd.options.add(opt);
+}</script>
 <script>
 function updateDepthTextInput(val) {
           document.getElementById('DMaxInID').value=val;
@@ -537,7 +520,7 @@ function updateLightTextInput(val) {
                         <option value="Starting Mass" selected>Starting Mass</option>
                         <option value="Total Daphnia">Total Daphnia</option>
                         <option value="Daphnia Size">Daphnia Size</option>
-                        <option value="K">Light</option>
+                        <option value="Light">Light</option>
                     </select>
                     </div>
 
@@ -556,9 +539,9 @@ function updateLightTextInput(val) {
                     <div style="width:45%;float:left;">
                     <label>Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists2(this,document.getElementById('dds'))">
                         <option value=""></option>
-                        
-                        <option value="2014">2014</option>
+                        <option value="2016">2016</option>
                         <option value="2015">2015</option>
+                        <option value="2014">2014</option>
                         </select>
                     </div>
                     <div style="width:45%;float:right;">
@@ -569,7 +552,7 @@ function updateLightTextInput(val) {
 
 
                 <div><br><br><label>Daphnia Density (per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
-                <label>Light Extinction Coefficient</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
+                <label>Light Extinction Coefficient (Higher is Darker)</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                 <label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
                 </div>
                 </div>
@@ -591,15 +574,14 @@ function updateLightTextInput(val) {
 		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
                 <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
-		
-		<div style="float:left;">
+                <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
-            </div><br>
-              	<div id="subutt">
+                </div><br>
+              		    <div id="subutt">
                         <input type="submit" value="Submit"/>
                     </div>
-                
+               
         </form>
     </div>
 </body>

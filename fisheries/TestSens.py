@@ -4,9 +4,11 @@
 import cgi, cgitb, time, os
 cgitb.enable()
 
+print ('Content-type:text/html\r\n\r\n')
+print('<html>')
+
 address = cgi.escape(os.environ["REMOTE_ADDR"])
 script = "Sensitivity Form"
-
 with open('userlog.csv', 'a') as log:
     log.write("IP: {}," .format(address))
     log.write("Page: {}," .format(script))
@@ -14,23 +16,22 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
-print ('Content-type:text/html\r\n\r\n')
-print('<html>')
+#<li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
-<script src="/js/JavaForFish.js"></script>
-<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <img class="head" src="/css/src/LPR.jpg">
 <head>
-    <title>GrowChinook</title>
+<script src="/js/JavaForFish.js"></script>
+<title>GrowChinook</title>
 </head>
 <body>
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/instructions.html">Instructions</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -61,6 +62,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 <div style="margin:auto;">
                 <label class="dd">Year:</label> <select name="Year" value="2015" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     
@@ -87,8 +89,8 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 
                 <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict depth</b></div>
                 <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
-                <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
+		        <label class="deptem">Maximum Depth (m):</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
+                <label class="deptem">Minimum Depth (m):</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
 
             </div>
@@ -97,8 +99,8 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 <div style="display:inline-block;">
                 <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
                 <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Temperature:</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
-                <label class="deptem">Minimum Temperature:</label><input class="deptem" type="text" name="TminIn" id="TminInID">
+		        <label class="deptem">Maximum Temperature (Celsius):</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
+                <label class="deptem">Minimum Temperature (Celsius):</label><input class="deptem" type="text" name="TminIn" id="TminInID">
                 </div>
                 </div>
                 <div><br></div>
@@ -107,6 +109,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 <div style="width:80%;"><b>Optional: Select a Year, Month, and Site to apply the corresponding Daphnia distribution curve. Otherwise, the curve corresponding to the Default Year, Month, and Site will be used.</b>
                 <label class="dd">Daphnia Year:</label> <select name="DYear" id="dddy" onchange="configureDropDownLists(this,document.getElementById('dddm'),document.getElementById('ddds'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     
@@ -122,6 +125,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                 <div><br></div>
                 <label class="dd">Temperature Year:</label> <select name="TYear" id="ddty"  onchange="configureDropDownLists(this,document.getElementById('ddtm'),document.getElementById('ddts'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     

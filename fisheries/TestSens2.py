@@ -13,13 +13,15 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
+#        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 print ('Content-type:text/html\r\n\r\n')
 print('<html>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <script src="/js/JavaForFish.js"></script>
 <script type="text/javascript">
 function configureDropDownLists2(ddy,dds) {
-var years = ['2013', '2014', '2015'];
+var years = ['2013', '2014', '2015','2016'];
 var sites = ['Blue River', 'Fall Creek', 'Hills Creek', 'Lookout Point'];
 
 switch (ddy.value) {
@@ -41,6 +43,12 @@ switch (ddy.value) {
             createOption(dds,sites[i],sites[i]);
         }
         break;
+    case '2016':
+        dds.options.length = 0;
+        for (i=1; i<sites.length; i++) {
+            createOption(dds,sites[i],sites[i]);
+        }
+        break;
     default:
         dds.options.length = 0;
     break;
@@ -55,6 +63,7 @@ function createOption(dd, text, value) {
     opt.text = text;
     dd.options.add(opt);
 }</script>
+
 <script>
 function updateDepthTextInput(val) {
           document.getElementById('DMaxInID').value=val;
@@ -96,11 +105,11 @@ function updateLightTextInput(val) {
 <body>
     <ul>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</li>
+        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -134,9 +143,9 @@ function updateLightTextInput(val) {
                     <div style="width:45%;float:left;">
                     <label>Select Year:</label> <select name="Year" id="ddy" onchange="configureDropDownLists2(this,document.getElementById('dds'))">
                         <option value=""></option>
-                        
-                        <option value="2014">2014</option>
+                        <option value="2016">2016</option>
                         <option value="2015">2015</option>
+                        <option value="2014">2014</option>
                         </select>
                     </div>
                     <div style="width:45%;float:right;">

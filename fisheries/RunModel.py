@@ -9,10 +9,12 @@ from Bioenergetics import *
 import cgi, cgitb
 import pylab
 import io
+import os
 from PIL import Image, ImageDraw
 import base64
 from scipy.interpolate import griddata
 import pandas
+import glob
 
 address = cgi.escape(os.environ["REMOTE_ADDR"])
 script = "Main Model Run Page"
@@ -23,7 +25,10 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
-Scruffy()
+cwd=os.getcwd()
+Scruffy(cwd,cwd,'output*')
+Scruffy('uploads/daph',cwd,'*')
+Scruffy('uploads/temp',cwd,'*')
 cgitb.enable()
 form = cgi.FieldStorage()
 title=form.getvalue('TabName')
@@ -38,6 +43,8 @@ if fileitem.file:
         if not line: break
         linecount = linecount + 1
 '''
+CustTemp = form.getvalue('CustTemp')
+CustDaph = form.getvalue('CustDaph')
 TempCurve = form.getvalue('tempCurve')
 StartingMass = form.getvalue('Starting_Mass_In')
 if StartingMass != None:
@@ -114,9 +121,21 @@ else:
     Tmin,Tmax = -1,1000
 
 PSite = form.getvalue('ESite')
+if PSite == None:
+    PSite = Site
 Elev = form.getvalue('Elev')
 if Elev == None:
     Elev = 10000
+else:
+    Elev=float(Elev)
+    if PSite == 'Fall Creek':
+        Dmax = (Elev-685.7)/3.281
+    elif PSite == 'Lookout Point':
+        Dmax = (Elev-702.1)/3.281
+    elif PSite == 'Hills Creek':
+        Dmax = (Elev-1246.7)/3.281
+
+
 DYear = form.getvalue('DYear')
 if DYear == None:
     DYear = Year
@@ -135,7 +154,19 @@ if TMonth == None:
 TSite = form.getvalue('TSite')
 if TSite == None:
     TSite = Site
-TempCurve = '{0}_T_{1}_{2}.csv'.format(TSite, TMonth, TYear)
+if CustTemp == None:
+    TYear = form.getvalue('TYear')
+    if TYear == None:
+        TYear = Year
+    TMonth = form.getvalue('TMonth')
+    if TMonth == None:
+        TMonth = Month
+    TSite = form.getvalue('TSite')
+    if TSite == None:
+        TSite = Site
+    TempCurve = '{0}_T_{1}_{2}.csv'.format(TSite, TMonth, TYear)
+else:
+    TempCurve = 'uploads/{}'.format(CustTemp)
 
 
 print ('Content-type:text/html; charset=utf-8\r\n\r\n')
@@ -160,28 +191,57 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
+#<li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
 
 Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
 try:
-    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite)
+    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,CustDaph)
     BaseResults,DConsumed,condition,condition1,daytemp,nighttemp,PopEst  = FreshBatch.Run_Batch()
 except:    
-    #print ('Content-Type: text/html')
-    #print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
-    #print ('<html>')
-    #print ('<head>')
-    #print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
-    #print ('<title>You are going to be redirected</title>')
-    #print ('</head>') 
-    #print ('<body>')
-    #print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
-    #print ('</body>')
-    #print ('</html>')
-    cgitb.handler()
+    print ('Content-Type: text/html')
+    print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
+    print ('<html>')
+    print ('<head>')
+    print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
+    print ('<title>You are going to be redirected</title>')
+    print ('</head>') 
+    print ('<body>')
+    print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
+    print ('</body>')
+    print ('</html>')
+    gitb.handler()
+
+dumbresults = {'Tab Name':[],'Elevation':[],'Reservoir(used for elevation)':[],'Daphnia Density':[],'Light':[],'Daphnia Size':[],'Min Depth':[],'Max Depth':[],'Min Temp':[],'Max Temp':[],'Daphnia Year':[],'Daphnia Month':[],'Daphnia Site':[],'Temperature File':[],'Starting Mass':[],'Ending Mass':[],'Day Depth':[],'Day Temperature':[],'Night Depth':[],'Night Temperature':[],'Day 1 Growth':[],'Day 30 Growth':[],'Daphnia Consumed':[],'Sustainable Estimate':[],'Estimated Condition Change':[]}
+dumbresults['Tab Name'].append(title)
+dumbresults['Elevation'].append(Elev)
+dumbresults['Reservoir(used for elevation)'].append(PSite)
+dumbresults['Daphnia Density'].append(Total_Daphnia)
+dumbresults['Light'].append(Light)
+dumbresults['Daphnia Size'].append(DaphSize)
+dumbresults['Min Depth'].append(Dmin)
+dumbresults['Max Depth'].append(Dmax)
+dumbresults['Min Temp'].append(Tmin)
+dumbresults['Max Temp'].append(Tmax)
+dumbresults['Daphnia Year'].append(DYear)
+dumbresults['Daphnia Month'].append(DMonth)
+dumbresults['Daphnia Site'].append(DSite)
+dumbresults['Temperature File'].append(TempCurve)
+dumbresults['Starting Mass'].append(StartingMass)
+dumbresults['Ending Mass'].append(BaseResults['StartingMass'][29])
+dumbresults['Day Depth'].append(BaseResults['day_depth'][29])
+dumbresults['Day Temperature'].append(daytemp)
+dumbresults['Night Depth'].append(BaseResults['night_depth'][29])
+dumbresults['Night Temperature'].append(nighttemp)
+dumbresults['Day 1 Growth'].append(BaseResults['growth'][0])
+dumbresults['Day 30 Growth'].append(BaseResults['growth'][29])
+dumbresults['Daphnia Consumed'].append(DConsumed)
+dumbresults['Sustainable Estimate'].append(PopEst)
+dumbresults['Estimated Condition Change'].append(condition)
+
 
 fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
@@ -214,6 +274,12 @@ with open(fname,'w') as outfile:
    writer = csv.writer(outfile)
    writer.writerow(BaseResults.keys())
    writer.writerows(zip(*BaseResults.values()))
+outfile.close()
+fname2=("output_short_%s.csv" % pid)
+with open(fname2,'w') as outfile:
+   writer = csv.writer(outfile)
+   writer.writerow(dumbresults.keys())
+   writer.writerows(zip(*dumbresults.values()))
 outfile.close()
 pylab.savefig(("new_%s.png" % pid),facecolor=fig.get_facecolor(), edgecolor='lightblue')
 data_uri = base64.b64encode(open(("new_%s.png" % pid), 'rb').read()).decode('utf-8').replace('\n', '')
@@ -255,18 +321,14 @@ print ('''
 
 print ('''
             </div>
-
             <div id="outdata">
                 <div class="dataleft">Day 1 Output Values:</div>
                 <div class="dataleft">Chinook Mass:
                     <div class="dataright">%.1f g</div>
                 </div>
-
-
                 <div class="dataleft">Growth:
                     <div class="dataright">%.2f g/g/day</div>
                 </div>
-
                 <div class="dataleft">Day Depth Occupied:
                     <div class="dataright">%.0f m</div>
                 </div>
@@ -303,7 +365,7 @@ print ('''
                 <div class="dataright">%+.2f</div>
                 </div>
                 <div class="dataleft">Population at which Density Dependent Interactions Expected:
-                <div class="dataright">%i</div>
+                <div class="dataright">%.0f</div>
                 </div>
             </div>
 
@@ -328,7 +390,10 @@ if tempr_flag == "YES":
 
 print('''
 <br><div style="float:left;">Download Full Results?
-                <a href="/{}" download>Download</a>
+                <a href="/{}" download>Download Full</a>
+            </div>
+<br><div style="float:left;">Download Short Results?
+                <a href="/{}" download>Download Short</a>
             </div>
 
 </div>
@@ -423,8 +488,15 @@ print('''
                         <select name="TMonth" id="ddtm">
                         </select><br><br><br>
                     </div>
-                    
-                    
+                  <div style="float:left;">
+                <label>Enter Name of Custom Daphnia File:</label>
+                <input type="text" style="width:25%;" name="CustDaph" id="CustDaph">
+            <br>
+</div>
+<div style="float:left;">
+                <label>Enter Name of Custom Temp File:</label>
+                <input type="text" style="width:25%;" name="CustTemp" id="CustTemp">
+            </div><br>
                 </div>
             </div>
             <div style="float:left;">
@@ -435,7 +507,7 @@ print('''
                 <div id="subutt" style="float:right;">
                     <input type="submit" value="Submit"/>
                 </div>
-            <div>Select Site for Population Estimate
+            <div>Select Site for Density Dependence
             <select name="ESite" id="ddes">
                         <option value=""></option>
                         <option value="Fall Creek">Fall Creek</option>
@@ -445,25 +517,55 @@ print('''
             </div>
             <br>
             <div style="float:left;">
-                <label>Enter Elevation for Population Estimate (ft):</label>
+                <label>Optional: Enter Pool Elevation (ft) for Density Dependence:</label>
                 <input type="text" style="width:25%;" name="Elev" id="ElevID">
             </div><br>
         </div>
     </form>
-<div style="float:left;">Download Temperature Template to Use Custom Temps
+<div style="float:left; width:45%;">Download Temperature Template to Use Custom Temps
                         <a href="/TemperatureTemplate.csv" download>Temperature Template</a>
-    <form action = "/upload.py" method="POST" enctype="multipart/form-data">
-    <input type="file" name="filename">
+<form action = "/UploadTemp.php" method="POST" enctype="multipart/form-data">
+    <input type="file" accept=".csv" name="tempfilename" id="tempfilename">
     <input type="submit" value="Upload">
     </form>
-                    </div>
+<br>
+Here is a list of uploaded temperature files:''')
+extension = 'csv'
+os.chdir('uploads/temp')
+temp_files = [i for i in glob.glob('*.csv')]
+
+print('''
+{}
+
+</div>
+
+'''.format(temp_files))
+
+os.chdir('../..')
+
+print('''
+<div style="float:right; width:45%;">Download Daphnia Template to Use Custom Daphnia Profile
+                        <a href="/DaphniaTemplate.csv" download>Daphnia Template</a>
+<form action = "/UploadDaph.php" method="POST" enctype="multipart/form-data">
+    <input type="file" accept=".csv" name="daphfilename" id="daphfilename">
+    <input type="submit" value="Upload">
+    </form>
     <br>
+Here is a list of uploaded daphnia files:''')
+extension = 'csv'
+os.chdir('uploads/daph')
+daph_files = [i for i in glob.glob('*.csv')]
+
+print('''
+{}
 
 </body>
-''' .format(fname,Year,Site,Month))
+'''.format(daph_files))
+
+
 print ('</html>')
 
-
+os.chdir('../..')
 os.remove(("new_%s.png" % pid))
 
 quit()

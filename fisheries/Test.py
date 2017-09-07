@@ -4,6 +4,7 @@
 import cgi
 import os
 import time
+import glob
 
 print ('Content-type:text/html\r\n\r\n')
 print('<html>')
@@ -17,11 +18,11 @@ with open('userlog.csv', 'a') as log:
     log.write('\n')
 log.closed
 
+#<li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
-<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <img class="head" src="/css/src/LPR.jpg">
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 <script src="/js/JavaForFish.js"></script>
 <title>GrowChinook</title>
 </head>
@@ -32,7 +33,7 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
@@ -129,8 +130,15 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
                         <select name="TMonth" id="ddtm">
                         </select><br><br><br>
                     </div>
-                    
-                    
+                  <div style="float:left;">
+                <label>Enter Name of Custom Daphnia File:</label>
+                <input type="text" style="width:25%;" name="CustDaph" id="CustDaph">
+            <br>
+</div>
+<div style="float:left;">
+                <label>Enter Name of Custom Temp File:</label>
+                <input type="text" style="width:25%;" name="CustTemp" id="CustTemp">
+            </div><br>
                 </div>
             </div>
             <div style="float:left;">
@@ -139,9 +147,9 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
             </div><br>
             <div style="display:inline-block;margin:auto;width:75%">
                 <div id="subutt" style="float:right;">
-                    <input type="submit" value="Submit"/>
+                    <input style="width:120px;" type="submit" value="Run Model"/>
                 </div>
-            <div>Select Site for Population Estimate
+            <div>Select Site for Density Dependence
             <select name="ESite" id="ddes">
                         <option value=""></option>
                         <option value="Fall Creek">Fall Creek</option>
@@ -151,20 +159,50 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
             </div>
             <br>
             <div style="float:left;">
-                <label>Enter Elevation for Population Estimate (ft):</label>
+                <label>Optional: Enter Pool Elevation (ft) for Density Dependence:</label>
                 <input type="text" style="width:25%;" name="Elev" id="ElevID">
             </div><br>
         </div>
     </form>
-<div style="float:left;">Download Temperature Template to Use Custom Temps
+<div style="float:left; width:45%;">Download Temperature Template to Use Custom Temps
                         <a href="/TemperatureTemplate.csv" download>Temperature Template</a>
-    <form action = "/upload.py" method="POST" enctype="multipart/form-data">
-    <input type="file" name="filename">
+<form action = "/UploadTemp.php" method="POST" enctype="multipart/form-data">
+    <input type="file" accept=".csv" name="tempfilename" id="tempfilename">
     <input type="submit" value="Upload">
     </form>
-                    </div>
+<br>
+Here is a list of uploaded temperature files:''')
+extension = 'csv'
+os.chdir('uploads/temp')
+temp_files = [i for i in glob.glob('*.csv')]
+
+print('''
+{}
+
+</div>
+
+'''.format(temp_files))
+
+os.chdir('../..')
+
+print('''
+<div style="float:right; width:45%;">Download Daphnia Template to Use Custom Daphnia Profile
+                        <a href="/DaphniaTemplate.csv" download>Daphnia Template</a>
+<form action = "/UploadDaph.php" method="POST" enctype="multipart/form-data">
+    <input type="file" accept=".csv" name="daphfilename" id="daphfilename">
+    <input type="submit" value="Upload">
+    </form>
     <br>
-    
+Here is a list of uploaded daphnia files:''')
+extension = 'csv'
+os.chdir('uploads/daph')
+daph_files = [i for i in glob.glob('*.csv')]
+
+print('''
+{}
+
 </body>
-''')
+'''.format(daph_files))
+
+
 print ('</html>')

@@ -17,7 +17,9 @@ import numpy
 from scipy.interpolate import griddata
 import pandas
 cgitb.enable()
-Scruffy()
+#cwd=os.getcwd()
+#Scruffy(cwd,cwd,'output*')
+#Scruffy('uploads',cwd,'*')
 form = cgi.FieldStorage()
 
 address = cgi.escape(os.environ["REMOTE_ADDR"])
@@ -35,7 +37,7 @@ StartingMass = form.getvalue('Starting_Mass_In')
 DYear = form.getvalue('DYear')
 DMonth = form.getvalue('DMonth')
 DSite = form.getvalue('DSite')
-TempCurve = '{0}_smoothed_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
+TempCurve = '{0}_T_{1}_{2}.csv'.format(form.getvalue('TSite'), form.getvalue('TMonth'), form.getvalue('TYear'))
 
 if StartingMass != None:
     StartingMass=float(StartingMass)
@@ -101,18 +103,33 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
         <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+
         <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
     </ul>''')
+
 print ('<head>')
 print ('<title>Here are Your Results.</title>')
 print ('</head>')
 
-Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
-FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite)
-BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
+try:
+    Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Month,Year)
+    FreshBatch = Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, StartingMass, Dmax, Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,None)
+    BaseResults,DConsumed,condition,condition1,dt,nt,PopEst  = FreshBatch.Run_Batch()
+except:    
+    print ('Content-Type: text/html')
+    print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
+    print ('<html>')
+    print ('<head>')
+    print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
+    print ('<title>You are going to be redirected</title>')
+    print ('</head>') 
+    print ('<body>')
+    print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
+    print ('</body>')
+    print ('</html>')
+    gitb.handler()
 
 largestout = 0.0
 numskips = 0
@@ -124,7 +141,7 @@ SensOutPer = []
 SensOutPerD1 = []
 Growths = []
 Growths1 = []
-csvheaders=[[] for i in range(11)]
+csvheaders=[[] for i in range(20)]
 if form.getvalue('Sparam_Range') != None:
     Sparam_Range = float(form.getvalue('Sparam_Range'))
 else:
@@ -134,14 +151,14 @@ SensFactors = Sensitivity_Expand(Sparam_Range, SensFactors)
 
 if SensParam == 'Starting Mass':
     Sparam = StartingMass
-    for i in range(11):
+    for i in range(20):
         if (Sparam * SensFactors[i]) < .02:
             SensInputs.append(.00001)
         else:
             SensInputs.append(Sparam * SensFactors[i])
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Starting Mass",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
+        batches.append(Batch(Site, Month, Year, Light, DaphSize, Total_Daphnia, SensInputs[i],Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,None))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(results[i][0]['growth'][29])
         SensOutPerD1.append(results[i][0]['growth'][0])
@@ -151,14 +168,14 @@ if SensParam == 'Starting Mass':
 
 elif SensParam == 'Total Daphnia':
     Sparam = Total_Daphnia
-    for i in range(11):
+    for i in range(20):
         if (Sparam * SensFactors[i]) > .02:
             SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Total Daphnia",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, DaphSize, SensInputs[i], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
+        batches.append(Batch(Site, Month, Year, Light, DaphSize, SensInputs[i], StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,None))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -168,14 +185,14 @@ elif SensParam == 'Total Daphnia':
 
 elif SensParam == 'Daphnia Size':
     Sparam = DaphSize
-    for i in range(11):
+    for i in range(20):
         if (Sparam * SensFactors[i]) > .02:
             SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("Daphnia Size",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
+        batches.append(Batch(Site, Month, Year, Light, SensInputs[i], Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,None))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -184,14 +201,14 @@ elif SensParam == 'Daphnia Size':
 
 elif SensParam == 'Light':
     Sparam = Light
-    for i in range(11):
+    for i in range(20):
         if (Sparam * SensFactors[i]) > .02:
             SensInputs.append(Sparam * SensFactors[i])
         else:
             SensInputs.append(.00001)
         SensFactors[i] = SensFactors[i] * 100
         csvheaders[i] = [Site,Month,Year,("%s: %f" % ("LEC(K)",SensInputs[i]))]
-        batches.append(Batch(Site, Month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite))
+        batches.append(Batch(Site, Month, Year, SensInputs[i], DaphSize, Total_Daphnia, StartingMass,Dmax,Dmin,Tmax,Tmin,TempCurve,DYear,DMonth,DSite,Elev,PSite,None))
         results.append(batches[i].Run_Batch())
         SensOutPer.append(100 * ((results[i][0]['growth'][29] - BaseResults['growth'][29]) / BaseResults['growth'][29]))
         SensOutPerD1.append(100 * ((results[i][0]['growth'][0] - BaseResults['growth'][0]) / BaseResults['growth'][0]))
@@ -365,7 +382,7 @@ print('''
                         <option value="Starting Mass" selected>Starting Mass</option>
                         <option value="Total Daphnia">Total Daphnia</option>
                         <option value="Daphnia Size">Daphnia Size</option>
-                        <option value="K">Light</option>
+                        <option value="Light">Light</option>
                     </select>
                     </div>
 
@@ -382,6 +399,7 @@ print('''
                 <div style="margin:auto;">
                 <label class="dd">Year:</label> <select name="Year" value="2015" id="ddy" onchange="configureDropDownLists(this,document.getElementById('ddm1'),document.getElementById('dds'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     
@@ -408,8 +426,8 @@ print('''
 
                 <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict depth</b></div>
                 <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Depth:</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
-                <label class="deptem">Minimum Depth:</label><input class="deptem" type="text" name="DminIn" id="DminInID">
+		        <label class="deptem">Maximum Depth (m):</label><input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
+                <label class="deptem">Minimum Depth (m):</label><input class="deptem" type="text" name="DminIn" id="DminInID">
                 </div>
 
             </div>
@@ -418,8 +436,8 @@ print('''
                 <div style="display:inline-block;">
                 <div class="deptem" style="float:left;"><p style="margin-top:auto;"><b>Optional: Set to restrict temperature</b></div>
                 <div style="float:right;width:70%;">
-		        <label class="deptem">Maximum Temperature:</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
-                <label class="deptem">Minimum Temperature:</label><input class="deptem" type="text" name="TminIn" id="TminInID">
+		        <label class="deptem">Maximum Temperature (Celsius):</label><input class="deptem" type="text" name="TmaxIn" id="TmaxInID"><br>
+                <label class="deptem">Minimum Temperature (Celsius):</label><input class="deptem" type="text" name="TminIn" id="TminInID">
                 </div>
                 </div>
                 <div><br></div>
@@ -428,6 +446,7 @@ print('''
                 <div style="width:80%;"><b>Optional: Select a Year, Month, and Site to apply the corresponding Daphnia distribution curve. Otherwise, the curve corresponding to the Default Year, Month, and Site will be used.</b>
                 <label class="dd">Daphnia Year:</label> <select name="DYear" id="dddy" onchange="configureDropDownLists(this,document.getElementById('dddm'),document.getElementById('ddds'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     
@@ -443,6 +462,7 @@ print('''
                 <div><br></div>
                 <label class="dd">Temperature Year:</label> <select name="TYear" id="ddty"  onchange="configureDropDownLists(this,document.getElementById('ddtm'),document.getElementById('ddts'))">
                     <option value=""></option>
+                    <option value="2016">2016</option>
                     <option value="2015">2015</option>
                     <option value="2014">2014</option>
                     
@@ -455,15 +475,15 @@ print('''
                 </select>
                 </div>
                     <br>
-                    <br><div style="float:left;">
+                    <br>
+                    <div style="float:left;">
                 <label>Enter Name to Display on Tab:</label>
                 <input type="text" style="width:50%;" name="TabName" id="TabNameID">
                 </div><br>
-
-                    <div id="subutt">
+                    <div id="subutt" style="margin:auto;">
                         <input type="submit" value="Submit"/>
                     </div>
-                
+                </div>
         </form>
     </div>
 </body>
