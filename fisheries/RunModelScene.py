@@ -24,8 +24,8 @@ with open('userlog.csv', 'a') as log:
 log.closed
 
 cwd=os.getcwd()
-Scruffy(cwd,cwd,'output*')
-Scruffy('uploads',cwd,'*')
+scruffy(cwd,cwd,'output*')
+scruffy('uploads',cwd,'*')
 cgitb.enable()
 form = cgi.FieldStorage()
 title=form.getvalue('TabName')
