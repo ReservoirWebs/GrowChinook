@@ -1,3 +1,3 @@
 # GrowChinook
 
-This code is in development. It is not yet ready for application, but it will be soon. Stay tuned!
+This code is in development. You can test out the model and the Graphic User Interface at: http://cas-web0.biossys.oregonstate.edu/
