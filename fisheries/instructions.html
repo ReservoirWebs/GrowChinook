@@ -16,7 +16,59 @@
         <li><a href="http://cas-web0.biosys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
         <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
-    </ul>
+</ul>
+
+<h1>This site allows you to run the model in four modes:<br></h1>
+
+<h3>The Standard Model - A single 30 day run<br></h3>
+<p style="margin-left:5em;">First, enter a Starting Mass for your fish. Then select a Year, Site,
+ and Month. These will be used to fill in Daphnia Density, Daphnia Size, Light Extinction
+ Coefficient, Daphnia Distribution Curve, and Temperature Curve.<br>
+ Clicking the "Apply Observed Values" button at this point will populate the Daphnia Density,
+ Daphnia Size, Light Extinction Coefficient fields, although you can override these values by
+ entering values into the "Using" fields.<br>
+ If you would like to restrict either the temperatures or depths available to your fish, use the
+ "Maximum Temperature", "Minimum Temperature", "Maximum Depth", and "Minimum Depth" fields
+ Enter temperatures in degrees celsius, and depths in meters.<br>
+ Be aware that restricting temperature or depth can lead to the fish having no available habitat.
+ This kills the model.<br>
+ Next, you may choose to override the observed Daphnia Distribution or Temperature curves
+ with either our observed data from a different Year/Site/Month combination,
+ by using the Daphnia and Temperature Year/Site/Month dropdowns, or by uploading custom
+ curves using our temperature and daphnia csv templates.<br>
+ Optionally, you can enter an elevation to be used to estimate, given the input parameters,
+ the population at which density dependent interactions are expected.<br>
+ Finally, enter a tab label to help keep track of your runs, and hit submit to run the model.<br>
+ Here are the default values used if all fields are left blank:<br>
+ - Starting Mass = 20<br>
+ - Year = 2015<br>
+ - Site = Fall Creek<br>
+ - Month = June</p>
+
+<h3>Model with Sensitivity - A set of standard runs over which a single input parameter is changed,
+while the other input parameters remain fixed.<br></h3>
+<p style="margin-left:5em;">First select the input parameter to run sensitivity analysis for,
+and enter the range (in percentage change to original value) to scale the value up to.
+This parameter will be entered into the model 20 times, nine times at values smaller than what
+you enter into the corresponding form field, once at that value, and ten times at values larger
+than the value entered on the form. For values smaller, your entered value will be divided by the
+numbers 2-10. For values larger, the range you entered will be divided into ten steps, and your
+value will be increased by one step each time, finally running at the percentage entered of the base value.<br>
+From here, follow the instructions for the Standard Model.</p>
+
+<h3>Advanced Sensitivity - Runs sensitivity analysis for every month for a given site and year<br></h3>
+<p style="margin-left:5em;">For Advanced Sensitivity, start as you would for a Sensitivity run, by selecting the
+ input parameter for which to run sensitivity analysis.<br>
+For advanced Sensitivity, you will select only a Site and Year, and the model will run for each Month for which
+background data corresponding to that Site and Year combination is available.<br>
+Options for this mode are limited to selecting Starting Mass, Daphnia Size, Daphnia Abundance, and Light
+ Extinction Coefficient. Leaving any of these fields blank will result in default values being used. For this run,
+the option to restrict Depth and Temperature is also available.
+
+<h3>Multiple Month Run - Runs consecutive 30 day runs to simulate a summer using observed data<br></h3>
+<p style="margin-left:5em;">For this run, simply select a Year, Site, Month, Starting Month, and Ending Month.<br>
+The model will run using observed data.
+
 
 </body>
 </html>

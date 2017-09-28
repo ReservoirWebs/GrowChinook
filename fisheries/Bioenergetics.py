@@ -118,34 +118,116 @@ def get_vals(light_in, total_daphnia_in, daphnia_size_in, site, month, year):
             }
 
     light = light_in
-    if light == 123456:
+    if light == float(123456):
         light = lights[(site, year)][month]
 
     total_daphnia = total_daphnia_in
-    if total_daphnia == 123456:
+    if total_daphnia == float(123456):
         total_daphnia = daphnias[(site, year)][month]
 
     daphnia_size = daphnia_size_in
-    if daphnia_size == 123456:
+    if daphnia_size == float(123456):
         daphnia_size = sizes[(site, year)][month]
 
     return light, total_daphnia, daphnia_size
 
-def is_none(item,alt):
+def is_none(item, alt):
     if item is None:
         new = alt
     else:
         new = item
     return new
 
-def sensitivity_expand(sparam_range, sparam_exp):
+def sensitivity_expand(form):
+    sparam_exp = []
+    if form.getvalue('Sparam_Range') != None:
+        sparam_range = float(form.getvalue('Sparam_Range'))
+    else:
+        sparam_range = 200
     step_size = (sparam_range-100)/1000
-    for i in range(10, 1, -1):
-        sparam_exp.append(float(1)/i)
+    for i in range(5, 1, -1):
+        sparam_exp.append(float(1)/(i*10))
     sparam_exp.append(1)
     for i in range(1, 11):
         sparam_exp.append(float(1)+(step_size*i))
     return sparam_exp
+
+def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site, ax2, ax3):
+    batches = []
+    results = []
+    sens_inputs = []
+    growths = []
+    growths1 = []
+    csvheaders = [[] for i in range(20)]
+    SHORT_RESULTS = {'Elevation': [], 'Reservoir(used for elevation)': [],
+                     'Daphnia Density': [], 'Light': [], 'Daphnia Size': [],
+                     'Min Depth': [], 'Max Depth': [], 'Min Temp': [], 'Max Temp': [],
+                     'Daphnia Year': [], 'Daphnia Month': [], 'Daphnia Site': [],
+                     'Temperature File': [], 'Starting Mass': [], 'Ending Mass': [],
+                     'Day Depth': [], 'Day Temperature': [], 'Night Depth': [],
+                     'Night Temperature': [], 'Day 1 Growth': [], 'Day 30 Growth': [],
+                     'Daphnia Consumed': [], 'Sustainable Estimate': [],
+                     'Estimated Condition Change': []}
+    if sparam == 'Starting Mass':
+        base_input = starting_mass
+    elif sparam == 'Total Daphnia':
+        base_input = daph_data.total_daph
+    elif sparam == 'Daphnia Size':
+        base_input = daph_data.daph_size
+    else:
+        base_input = site_data.light
+
+    for i in range(15):
+        if (base_input * sens_factors[i]) > 0.02:
+            sens_inputs.append(base_input * sens_factors[i])
+        else:
+            sens_inputs.append(.00001)
+        sens_factors[i] = sens_factors[i] * 100
+        csvheaders[i] = [site_data.site, site_data.month, site_data.year, ("%s: %f" % (sparam, sens_inputs[i]))]
+        if sparam == 'Starting Mass':
+            batches.append(Batch(site_data, sens_inputs[i], daph_data, max_temp, min_temp, cust_temp, elev, pop_site))
+        elif sparam == 'Total Daphnia':
+            daph_data.total_daph = sens_inputs[i]
+            batches.append(Batch(site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site))
+        elif sparam == 'Daphnia Size':
+            daph_data.daph_size = sens_inputs[i]
+            batches.append(Batch(site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site))
+        else:
+            site_data.light = sens_inputs[i]
+            batches.append(Batch(site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site))
+
+        res, taway, condition, condition1, dt, nt, taway2 = batches[i].Run_Batch()
+        results.append(res)
+        #SHORT_RESULTS['Tab Name'].append(vals.title)
+        SHORT_RESULTS['Elevation'].append(elev)
+        SHORT_RESULTS['Reservoir(used for elevation)'].append(pop_site)
+        SHORT_RESULTS['Daphnia Density'].append(daph_data.total_daph)
+        SHORT_RESULTS['Light'].append(site_data.light)
+        SHORT_RESULTS['Daphnia Size'].append(daph_data.daph_size)
+        SHORT_RESULTS['Min Depth'].append(site_data.min_depth)
+        SHORT_RESULTS['Max Depth'].append(site_data.max_depth)
+        SHORT_RESULTS['Min Temp'].append(min_temp)
+        SHORT_RESULTS['Max Temp'].append(max_temp)
+        SHORT_RESULTS['Daphnia Year'].append(daph_data.d_year)
+        SHORT_RESULTS['Daphnia Month'].append(daph_data.d_month)
+        SHORT_RESULTS['Daphnia Site'].append(daph_data.d_site)
+        SHORT_RESULTS['Temperature File'].append(cust_temp)
+        SHORT_RESULTS['Starting Mass'].append(starting_mass)
+        SHORT_RESULTS['Ending Mass'].append(results[i]['StartingMass'][29])
+        SHORT_RESULTS['Day Depth'].append(results[i]['day_depth'][29])
+        SHORT_RESULTS['Day Temperature'].append(dt)
+        SHORT_RESULTS['Night Depth'].append(results[i]['night_depth'][29])
+        SHORT_RESULTS['Night Temperature'].append(nt)
+        SHORT_RESULTS['Day 1 Growth'].append(results[i]['growth'][0])
+        SHORT_RESULTS['Day 30 Growth'].append(results[i]['growth'][29])
+        SHORT_RESULTS['Daphnia Consumed'].append(taway)
+        SHORT_RESULTS['Sustainable Estimate'].append(taway2)
+        SHORT_RESULTS['Estimated Condition Change'].append(condition)
+        growths.append(results[i]['growth'][29])
+        growths1.append(results[i]['growth'][0])
+
+    return results, growths, growths1, csvheaders, sens_inputs, SHORT_RESULTS, ax2, ax3
+
 
 class Daph_Data:
     def __init__(self, abundance, size, year, site, month):
@@ -155,13 +237,63 @@ class Daph_Data:
         self.d_site = site
         self.d_month = month
 
-class Form_Data:
-    def __init__(self, title, temp_curve, start_mass, tot_daph, daph_size, light,
-                 year, month, site, dep_max, dep_min, temp_max, temp_min, pop_site,
-                 elev, daph_year, daph_month, daph_site, temp_year, temp_month, temp_site):
-        
-        is_none(title, 'GrowChinook Results')
-        
+class Form_Data_Packager:
+    def __init__(self, form):
+        self.title = is_none(form.getvalue('TabName'), 'GrowChinook Results')
+        self.starting_mass = float(is_none(form.getvalue('Starting_Mass_In'), 20))
+        self.total_daphnnia = float(is_none(form.getvalue('Total_Daphnia_Input_Name'), is_none(form.getvalue('TotDDef'), 123456)))
+        self.daphnia_size = float(is_none(form.getvalue('Daphnia Size'), is_none(form.getvalue('DaphSDef'), 123456)))
+        self.light = float(is_none(form.getvalue('Light'), is_none(form.getvalue('LightDef'), 123456)))
+        self.year = is_none(form.getvalue('Year'), '2015')
+        self.month = is_none(form.getvalue('Month1'), 'June')
+        self.site = is_none(form.getvalue('Site'), 'Fall Creek')
+        self.max_dep = float(is_none(form.getvalue('DmaxIn'), 10000))
+        self.min_dep = float(is_none(form.getvalue('DminIn'), -1))
+        self.max_temp = float(is_none(form.getvalue('TmaxIn'), 10000))
+        self.min_temp = float(is_none(form.getvalue('TminIn'), -1))
+        if self.min_temp == self.max_temp:
+            self.max_temp = self.max_temp + 1
+        self.pop_site = is_none(form.getvalue('ESite'), self.site)
+        self.elev = float(is_none(form.getvalue('Elev'), 100000))
+        if self.pop_site == 'Fall Creek':
+            self.max_dep = min(((self.elev - FC_MIN_EL) / 3.281), self.max_dep)
+        elif self.pop_site == 'Lookout Point':
+            self.max_dep = min(((self.elev - LP_MIN_EL) / 3.281), self.max_dep)
+        elif self.pop_site == 'Hills Creek':
+            self.max_dep = min(((self.elev - HC_MIN_EL) / 3.281), self.max_dep)
+        self.daph_year = is_none(form.getvalue('DYear'), self.year)
+        self.daph_month = is_none(form.getvalue('DMonth'), self.month)
+        self.daph_site = is_none(form.getvalue('DSite'), self.site)
+        self.temp_year = is_none(form.getvalue('TYear'), self.year)
+        self.temp_month = is_none(form.getvalue('TMonth'), self.month)
+        self.temp_site = is_none(form.getvalue('TSite'), self.site)
+        if form.getvalue('CustTemp') is None:
+            self.cust_temp = '{0}_T_{1}_{2}.csv'.format(self.temp_site, self.temp_month, self.temp_year)
+        else:
+            self.cust_temp = 'uploads/{}'.format(form.getvalue('CustTemp'))
+
+        self.light, self.total_daphnnia, self.daphnia_size = get_vals(self.light, self.total_daphnnia, self. daphnia_size, self.site, self.month, self.year)
+        self.site_data = Site_Data(self.year, self.site, self.month, self.light, self.max_dep, self.min_dep)
+        self.daph_data = Daph_Data(self.total_daphnnia, self.daphnia_size, self.daph_year, self.daph_site, self.daph_month)
+
+class Adv_Sens_Form_Data_Packager:
+    def __init__(self, form):
+        self.title = is_none(form.getvalue('TabName'), 'GrowChinook Results')
+        self.starting_mass = float(is_none(form.getvalue('Starting_Mass_In'), 20))
+        self.total_daphnnia = float(is_none(form.getvalue('Total_Daphnia_Input_Name'), is_none(form.getvalue('TotDDef'), 123456)))
+        self.daphnia_size = float(is_none(form.getvalue('Daphnia Size'), is_none(form.getvalue('DaphSDef'), 123456)))
+        self.light = float(is_none(form.getvalue('Light'), is_none(form.getvalue('LightDef'), 123456)))
+        self.year = is_none(form.getvalue('Year'), '2015')
+        self.site = is_none(form.getvalue('Site'), 'Fall Creek')
+        self.max_dep = float(is_none(form.getvalue('DmaxIn'), 10000))
+        self.min_dep = float(is_none(form.getvalue('DminIn'), -1))
+        self.max_temp = float(is_none(form.getvalue('TmaxIn'), 10000))
+        self.min_temp = float(is_none(form.getvalue('TminIn'), -1))
+
+        if self.min_temp == self.max_temp:
+            self.max_temp = self.max_temp + 1
+        self.site_data = Site_Data(self.year, self.site, None, self.light, self.max_dep, self.min_dep)
+        self.daph_data = Daph_Data(self.total_daphnnia, self.daphnia_size, self.year, self.site, None)
 
 
 class Site_Data:
@@ -194,6 +326,8 @@ class Batch:
         self.dtfinal = 0
         self.ntfinal = 0
         self.depths = []
+        self.elevation = elevation
+        self.PSite = PSite
         self.SparamExp = []
         # Body lengths (from grey lit((())))
         self.SwimSpeed = 2
@@ -208,6 +342,7 @@ class Batch:
         self.daphnia_dry_weight = (np.exp(1.468 + 2.83 * np.log(self.daphnia_size))) /\
                              1000000 #From Ghazy, others use ~10%
         self.daphnia_weight = self.daphnia_dry_weight * 8.7 / 0.322
+
         if elevation is None:
             self.elevation = 100000
         else:
@@ -246,8 +381,8 @@ class Batch:
         with open(f) as fid:
             reader = DictReader(fid, quoting=QUOTE_NONNUMERIC)
             self.params = next(reader)
-            if self.temp_file == "None_smoothed_None_None.csv":
-                temperature_file = '{0}_smoothed_{1}_{2}.csv'\
+            if self.temp_file == "None_T_None_None.csv":
+                temperature_file = '{0}_T_{1}_{2}.csv'\
                     .format(self.site, self.month, self.year)
             else:
                 temperature_file = temp_file
@@ -468,7 +603,7 @@ class Batch:
                                                        hours, light, self.prey)
         return depth_arr[idx], best_growth, best_consumption
 
-    def plot_growth():
+    def plot_growth(self):
         depth_arr = np.arange(min(depths), max(depths), 0.1)
         gs_d = [growth_fn(d, self.out['StartingLength'][0], self.out['StartingMass'][0],
                           day_hours, DayLight, self.prey) for d in depth_arr]
@@ -555,5 +690,5 @@ class Batch:
         daph = self.daphline(day_depth)
         PopEst = get_sustain_est(ele, daph, dailyconsume, self.PSite)
         condition = float(100*(self.starting_mass-self.starting_mass_initial)*((self.StartingLength/10)**(-3.0)))
-        return (self.out, dailyconsume, condition, condition1, dtfinal, ntfinal, PopEst)
+        return self.out, dailyconsume, condition, condition1, dtfinal, ntfinal, PopEst
 
