@@ -329,7 +329,7 @@ class Batch:
         self.elevation = elevation
         self.PSite = PSite
         self.SparamExp = []
-        # Body lengths (from grey lit((())))
+        # Swimming speed is in body lengths (Celedonia et al. 2008)
         self.SwimSpeed = 2
         self.params = {}
         # J/gram of O2 in respiration conversions (Elliot and Davidson 1975).
