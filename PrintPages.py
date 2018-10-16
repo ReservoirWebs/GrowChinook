@@ -18,50 +18,50 @@ def print_header(title, page):
     if page == 'Std':
         print('''
         <ul>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/instructions.html">Instructions</a></li>
-            <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/">Home</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/instructions.html">Instructions</a></li>
+            <li><a class="current" href="http://growchinook.fw.oregonstate.edu/Test.py">Run Standard Model</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/about.html">About</a></li>
         </ul>''')
     elif page == 'Sens':
         print('''
         <ul>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/instructions.html">Instructions</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-            <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
-            <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/">Home</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/instructions.html">Instructions</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/Test.py">Run Standard Model</a></li>
+            <li><a class="current" href="http://growchinook.fw.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+            <li><a href="http://growchinook.fw.oregonstate.edu/about.html">About</a></li>
         </ul>''')
     elif page == 'AdvSens':
         print('''
                 <ul>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/instructions.html">Instructions</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-                    <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/">Home</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/instructions.html">Instructions</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/Test.py">Run Standard Model</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+                    <li><a class="current" href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/about.html">About</a></li>
                 </ul>''')
     elif page == 'Mult':
         print('''
                 <ul>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/instructions.html">Instructions</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-                    <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
-                    <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/">Home</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/instructions.html">Instructions</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/Test.py">Run Standard Model</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+                    <li><a class="current" href="http://growchinook.fw.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+                    <li><a href="http://growchinook.fw.oregonstate.edu/about.html">About</a></li>
                 </ul>''')
 
 

@@ -11,7 +11,7 @@ table {
 #formwrap {
     margin: auto;
     background-color: #c8e9b1;
-    width: 95%;
+    width: 98%;
     overflow: hidden;
     border: solid #88a56e;
     border-width: 3px;
@@ -19,22 +19,24 @@ table {
 
 ul {
     list-style-type: none;
-	text-align:center;
+    text-align:center;
     margin-left:auto;
     margin-right: auto;
     padding: 0;
     overflow: hidden;
     background-color: #88a56e;
-    width:90%;
+    width:98%;
 }
 
 li {
     display:inline-block;
-    width:13%;
+    width:10%;
+    padding: 10px;
 }
 
 li a {
 	width:100%;
+    padding: 10px;
     display: block;
     color: black;
     text-align: center;
@@ -45,6 +47,8 @@ li a {
 .current {
     background-color: #c8e9b1;
     color: #552E00;
+    border: solid #88a56e;
+    border-width: 3px;
 }
 
 #valuewrap {
@@ -92,7 +96,7 @@ body {
 }
 
 img.head {
-    width: 90%;
+    width: 98%;
     display:block;
     margin-left:auto;
     margin-right:auto;
@@ -124,6 +128,7 @@ h2 {color: #552E00;
 
 label, input {
     display: inline-block;
+
 }
 input{
     width: 80px;
@@ -192,7 +197,7 @@ label {
 }
 
 label.dd {
-    width: 100px;
+    width: 10%;
     text-align: right;
     font: normal normal 20px 'Times New Roman', Times, FreeSerif, sans-serif;
 }
@@ -224,5 +229,5 @@ width:50%;
 img.fig2{
 display:block;
 margin:auto;
-width:40%;
+width:65%;
 }
