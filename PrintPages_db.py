@@ -79,7 +79,7 @@ def print_in_data(site, year, mass, total_daphnia, daphnia_size, light):
                     <div class="dataleft">Chinook Starting Mass:
                         <div class="dataright">%.1f g</div>
                     </div>
-                    <div class="dataleft">Daphnia Density (thousand per m2 surface):
+                    <div class="dataleft">Daphnia Density (total per m2 from depth to surface):
                         <div class="dataright">%.0f</div>
                     </div>
                     <div class="dataleft">Daphnia Size (mm):
@@ -164,22 +164,15 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
                         <b>Optional: Set to restrict depths. Day depth fields apply only to daytime, and supercede the other fields if both are used.</b>
                     </div>
                     <div style="float:right;width:70%;">
-                        <label class="deptem">Maximum Depth (m):</label>
-                        <input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
-                        <label class="deptem">Minimum Depth (m):</label>
-                        <input class="deptem" type="text" name="DminIn" id="DminInID"><br>
+                        <label class="deptem">Depth Start(m):</label>
+                        <input class="deptem" type="text" name="Dstart" id="DminInID"><br>
+                        <label class="deptem">Depth Finish(m):</label>
+                        <input class="deptem" type="text" name="Dfinish" id="DmaxInID"><br>
+                        
 <br><br><br>                    
 </div>
                     
-                    <div class="deptem" style="float:left;"><p style="margin-top:auto;">
-                        <b>Optional: Set to restrict day depth only (allows all depths at night).</b>
-                    </div>
-                    <div style="float:right;width:70%;">
-                        <label class="deptem">Maximum Day Depth (m):</label>
-                        <input class="deptem" type="text" name="DmaxDayIn" id="DmaxInID"><br>
-                        <label class="deptem">Minimum Day Depth (m):</label>
-                        <input class="deptem" type="text" name="DminDayIn" id="DminInID">
-                    </div>
+                    
                 </div>
                 <div id="sec2">
                     <div style="display:inline-block;">
@@ -339,7 +332,7 @@ def print_adv_sens_form(long_file_name, short_file_name, in_out, target):
                         </div>
                     <div style="float:left;">
                         <br>
-                        <label>Daphnia Density (depth to surface total per m<sup>2</sup>)</label>Use:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
+                        <label>Daphnia Density (thousand per m<sup>2</sup> surface)</label>Use:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
                         <label>Light Extinction Coefficient (Higher is Darker)</label>Use:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                         <label>Daphnia Size (mm):</label>Use:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
                     </div></div>

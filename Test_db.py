@@ -3,13 +3,13 @@
 import os
 import glob
 import cgi
-import PrintPages as pt
+import PrintPages_db as pt
 
 address = cgi.escape(os.environ["REMOTE_ADDR"])
 script = "Main Model Form"
 pt.write_log_entry(script, address)
 pt.print_header('GrowChinook', 'Std')
-pt.print_full_form(None, None, 'in', 'RunModel.py')
+pt.print_full_form(None, None, 'in', 'RunModel_db.py')
 os.chdir('uploads/temp/')
 temp_result = [i for i in glob.glob('*.csv')]
 os.chdir('../..')

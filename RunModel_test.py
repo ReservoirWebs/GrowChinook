@@ -2,7 +2,6 @@
 
 import csv
 import matplotlib
-import sys
 matplotlib.use('Agg')
 from Bioenergetics import *
 import cgi
@@ -23,14 +22,12 @@ scruffy('uploads/temp/', CWD, '*')
 pt.print_header(form.getvalue('TabName'), 'Std')
 cgitb.enable()
 vals = Form_Data_Packager(form)
-stdout = sys.stdout
+
 
 try:
-    with open('bioe.out','w') as f:
-        sys.stdout = f
-        FRESH_BATCH = Batch(vals.site_data, vals.starting_mass, vals.daph_data, vals.max_temp, vals.min_temp, vals.cust_temp, vals.elev, vals.pop_site, True)
-        BASE_RESULTS, DAPHNIA_CONSUMED, CONDITION, CONDITION1, DAY_TEMP, NIGHT_TEMP,\
-            POPULATION_ESTIMATE, DAY_P, NIGHT_P = FRESH_BATCH.Run_Batch()
+    FRESH_BATCH = Batch(vals.site_data, vals.starting_mass, vals.daph_data, vals.max_temp, vals.min_temp, vals.cust_temp, vals.elev, vals.pop_site)
+    BASE_RESULTS, DAPHNIA_CONSUMED, CONDITION, CONDITION1, DAY_TEMP, NIGHT_TEMP,\
+    POPULATION_ESTIMATE = FRESH_BATCH.Run_Batch()
 except:
     #print('Content-Type: text/html')
     #print('Location: http://growchinook.fw.oregonstate.edu/error.html')
@@ -45,11 +42,7 @@ except:
     #      'Click here if you are not redirected</a>')
     #print('</body>')
     #print('</html>')
-    with open('log.out','w') as f:
-        f.write(','.join([str(x) for x in [vals.site_data, vals.starting_mass, vals.daph_data, vals.max_temp, vals.min_temp, vals.cust_temp, vals.elev, vals.pop_site]]))
     cgitb.handler()
-finally:
-    sys.stdout = stdout
 
 SHORT_RESULTS = {'Tab Name':[], 'Elevation':[], 'Reservoir(used for elevation)':[],
                  'Daphnia Density':[], 'Light':[], 'Daphnia Size':[],
@@ -59,7 +52,7 @@ SHORT_RESULTS = {'Tab Name':[], 'Elevation':[], 'Reservoir(used for elevation)':
                  'Day Depth':[], 'Day Temperature':[], 'Night Depth':[],
                  'Night Temperature':[], 'Day 1 Growth':[], 'Day 30 Growth':[],
                  'Daphnia Consumed':[], 'Sustainable Estimate':[],
-                 'Estimated Condition Change':[], 'Day P':[], 'Night P':[]}
+                 'Estimated Condition Change':[]}
 SHORT_RESULTS['Tab Name'].append(vals.title)
 SHORT_RESULTS['Elevation'].append(vals.elev)
 SHORT_RESULTS['Reservoir(used for elevation)'].append(vals.pop_site)
@@ -75,7 +68,7 @@ SHORT_RESULTS['Daphnia Month'].append(vals.daph_month)
 SHORT_RESULTS['Daphnia Site'].append(vals.daph_site)
 SHORT_RESULTS['Temperature File'].append(vals.cust_temp)
 SHORT_RESULTS['Starting Mass'].append(vals.starting_mass)
-SHORT_RESULTS['Ending Mass'].append(BASE_RESULTS['Mass'][29])
+SHORT_RESULTS['Ending Mass'].append(BASE_RESULTS['StartingMass'][29])
 SHORT_RESULTS['Day Depth'].append(BASE_RESULTS['day_depth'][29])
 SHORT_RESULTS['Day Temperature'].append(DAY_TEMP)
 SHORT_RESULTS['Night Depth'].append(BASE_RESULTS['night_depth'][29])
@@ -85,13 +78,11 @@ SHORT_RESULTS['Day 30 Growth'].append(BASE_RESULTS['growth'][29])
 SHORT_RESULTS['Daphnia Consumed'].append(DAPHNIA_CONSUMED)
 SHORT_RESULTS['Sustainable Estimate'].append(POPULATION_ESTIMATE)
 SHORT_RESULTS['Estimated Condition Change'].append(CONDITION)
-SHORT_RESULTS['Day P'].append(DAY_P)
-SHORT_RESULTS['Night P'].append(NIGHT_P)
 
 FIG = pyplot.figure(facecolor='#c8e9b1')
 FIG.suptitle('Juvenile Spring Chinook', fontsize=20)
 MASS_PLOT = FIG.add_subplot(221)
-MASS_PLOT.plot(BASE_RESULTS['Mass'], label="Mass (g)")
+MASS_PLOT.plot(BASE_RESULTS['StartingMass'], label="Mass (g)")
 MASS_PLOT.set_ylabel('Mass (g)')
 MASS_PLOT.set_xlabel('Day of Month')
 GROWTH_PLOT = FIG.add_subplot(222)
@@ -189,9 +180,9 @@ print('''
 
 
        <br>
-       ''' % (BASE_RESULTS['Mass'][0], BASE_RESULTS['growth'][0],
+       ''' % (BASE_RESULTS['StartingMass'][0], BASE_RESULTS['growth'][0],
               BASE_RESULTS['day_depth'][0], BASE_RESULTS['night_depth'][0],
-              BASE_RESULTS['Mass'][29], BASE_RESULTS['growth'][29],
+              BASE_RESULTS['StartingMass'][29], BASE_RESULTS['growth'][29],
               BASE_RESULTS['day_depth'][29], DAY_TEMP, BASE_RESULTS['night_depth'][29],
               NIGHT_TEMP, DAPHNIA_CONSUMED, CONDITION, POPULATION_ESTIMATE))
 
@@ -213,21 +204,16 @@ if vals.max_temp != 10000 or vals.min_temp != -1:
           Temperature restricted to between %.2f degrees and %.2f degrees.</div><br>
           ''' % (vals.max_temp, vals.min_temp))
 print('</div>')
-pt.print_full_form(LONG_OUT_FILENAME, SHORT_OUT_FILENAME, 'out', 'RunModel_test.py')
-os.chdir('uploads/temp/')
-temp_result = [i for i in glob.glob('*.csv')]
-os.chdir('../..')
-os.chdir('uploads/daph/')
-daph_result = [i for i in glob.glob('*.csv')]
+pt.print_full_form(LONG_OUT_FILENAME, SHORT_OUT_FILENAME, 'out', 'RunModel.py')
+extension = 'csv'
+os.chdir('uploads/temp')
+result = [i for i in glob.glob('*.csv')]
 
 print('''
 {}
 </div>
-<div style="width:100%; float:right;">
-        Here is a list of uploaded daphnia files:{}
-</div>
 </body>
-'''.format(temp_result, daph_result))
+'''.format(result))
 print('</html>')
 
 os.chdir('../..')

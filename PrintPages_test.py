@@ -17,8 +17,6 @@ def print_header(title, page):
     <img class="head" src="/css/src/LPR.jpg">
     <body>''')
 
-#<li><a href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-
     if page == 'Std':
         print('''
         <ul>
@@ -87,13 +85,20 @@ def print_in_data(site, year, mass, total_daphnia, daphnia_size, light):
                     </div>
                     <div class="dataleft">Light Extinction Coefficient:
                         <div class="dataright">%.2f</div>
-                    </div>''' % (site, year, mass, total_daphnia, daphnia_size, light))
+                    </div>
+                    </div>
+                </div>
+                ''' % (site, year, mass, total_daphnia, daphnia_size, light))
 
 
 def print_full_form(long_file_name, short_file_name, in_out, target):
     if in_out == 'out':
         print('''
               <br>
+              </div>
+              <br>
+              <br>
+              <div>
               <div style="float:left;">Download Full Results?
                   <a href="/{}" download>Download Full</a>
               </div>
@@ -101,8 +106,10 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
               <div style="float:left;">Download Short Results?
                   <a href="/{}" download>Download Short</a>
               </div>
+              </div>
           </div>
-      </div>'''.format(long_file_name, short_file_name))
+      </div>
+      '''.format(long_file_name, short_file_name))
 
     print('''
     <body>
@@ -110,7 +117,7 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
         <div id="formwrap">
             <form action='{}' method="post" target="_blank">'''.format(target))
 
-    if target == 'RunModelSens.py':
+    if target == 'RunModelSens_test.py':
         print('''<div style="display:inline-block;width:90%;">
                      <div style="font-size:20px;width:45%;float:left;margin:auto;">First Select Sensitivity Parameter:
                          <select name="Sens_Param"><br>
@@ -156,29 +163,17 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
                         Apply Observed Values
                         </button>
                     </div><br>
-                    Observed:<input class="defdisp" type="text" name="TotDDef" id="TotDDef" value="" readonly><label>Daphnia Density (thousand per m<sup>2</sup> surface)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
+                    Observed:<input class="defdisp" type="text" name="TotDDef" id="TotDDef" value="" readonly><label>Daphnia Density (depth to surface per m<sup>2</sup>)</label>Using:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
                     Observed:<input class="defdisp" type="text" name="LightDef" id="LightDef" value="" readonly><label>Light Extinction Coefficient (Higher is Darker)</label>Using:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                     Observed:<input class="defdisp" type="text" name="DaphSDef" id="DaphSDef" value="" readonly><label>Daphnia Size (mm):</label>Using:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
-                    
                     <div class="deptem" style="float:left;"><p style="margin-top:auto;">
-                        <b>Optional: Set to restrict depths. Day depth fields apply only to daytime, and supercede the other fields if both are used.</b>
+                        <b>Optional: Set to restrict depth</b>
                     </div>
                     <div style="float:right;width:70%;">
                         <label class="deptem">Maximum Depth (m):</label>
                         <input class="deptem" type="text" name="DmaxIn" id="DmaxInID"><br>
                         <label class="deptem">Minimum Depth (m):</label>
-                        <input class="deptem" type="text" name="DminIn" id="DminInID"><br>
-<br><br><br>                    
-</div>
-                    
-                    <div class="deptem" style="float:left;"><p style="margin-top:auto;">
-                        <b>Optional: Set to restrict day depth only (allows all depths at night).</b>
-                    </div>
-                    <div style="float:right;width:70%;">
-                        <label class="deptem">Maximum Day Depth (m):</label>
-                        <input class="deptem" type="text" name="DmaxDayIn" id="DmaxInID"><br>
-                        <label class="deptem">Minimum Day Depth (m):</label>
-                        <input class="deptem" type="text" name="DminDayIn" id="DminInID">
+                        <input class="deptem" type="text" name="DminIn" id="DminInID">
                     </div>
                 </div>
                 <div id="sec2">
@@ -234,11 +229,7 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
                     <label>Enter Name of Custom Temp File:</label>
                     <input type="text" style="width:25%;" name="CustTemp" id="CustTemp">
                 </div>
-                    <div style="float:left;">
-                    <label>Enter Name of Custom Daphnia File:</label>
-                    <input type="text" style="width:25%;" name="CustDaph" id="CustDaph">
-                </div>
-                </div>
+                    </div>
                 </div>
                 <div style="float:left;">
                     <br>
@@ -269,23 +260,16 @@ def print_full_form(long_file_name, short_file_name, in_out, target):
             <br><br>
         </form>
 
-        <div style="width:49%; float:left;">Download Temperature Template to Use Custom Temps:<br>
+        <div style="width:48%; float:left;">Download Temperature Template to Use Custom Temps:<br>
                             <a href="/TemperatureTemplate.csv" download>Temperature Template</a><br>
         <form action = "/UploadTemp.php" method="POST" enctype="multipart/form-data">
-            <input type="file" accept=".csv" name="filename" id="filename" style="width:300px;">
+            <input type="file" accept=".csv" name="filename" id="filename" style="width:130px;">
             <input type="submit" value="Upload" style="width:100px;">
             </form>
                         </div>
-        <div style="width:49%; float:right;">Download Daphnia Template to Use Custom Daph Curve:<br>
-                            <a href="/DaphniaTemplate.csv" download>Daphnia Template</a><br>
-        <form action = "/UploadDaph.php" method="POST" enctype="multipart/form-data">
-            <input type="file" accept=".csv" name="daphfilename" id="daphfilename" style="width:300px;">
-            <input type="submit" value="Upload" style="width:100px;">
-            </form>
-                        </div>
-        <div style="width:100%; float:right;"><br>
+        <br>
+        <div style="width:48%; float:right;">
         Here is a list of uploaded temperature files:''')
-
 
 def print_adv_sens_form(long_file_name, short_file_name, in_out, target):
     if in_out == 'out':
@@ -339,7 +323,7 @@ def print_adv_sens_form(long_file_name, short_file_name, in_out, target):
                         </div>
                     <div style="float:left;">
                         <br>
-                        <label>Daphnia Density (depth to surface total per m<sup>2</sup>)</label>Use:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
+                        <label>Daphnia Density (thousand per m<sup>2</sup> surface)</label>Use:<input type="text" name="Total_Daphnia_Input_Name" id="TotDTextInID" oninput="TotDSlide.value = TotDTextInID.value" oninput="TotDOutID.value = TotDInID.value"> <br><br>
                         <label>Light Extinction Coefficient (Higher is Darker)</label>Use:<input type="text" name="Light" id="LightTextInID" oninput="LightSlide.value = Light.value"><output name="Light_TextOut" id="Light_TextOutID"> </output> <br><br>
                         <label>Daphnia Size (mm):</label>Use:<input type="text" name="Daphnia Size" id="DaphSTextInID" oninput="DaphSSlide.value = DaphSTextInID.value"> <br><br>
                     </div></div>

@@ -164,8 +164,8 @@ class Batch:
         with open(f) as fid:
             reader = DictReader(fid, quoting=QUOTE_NONNUMERIC)
             self.params = next(reader)
-            if self.TempCurve == "None_smoothed_None_None.csv":
-                temperature_file = '{0}_smoothed_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
+            if self.TempCurve == "None_T_None_None.csv":
+                temperature_file = '{0}_T_{1}_{2}.csv'.format(self.Site, self.Month, self.Year)
             else:
                 temperature_file = TempCurve
 
@@ -364,7 +364,7 @@ class Batch:
         best_growth, best_consumption = self.growth_fn(d, StartingLength, StartingMass, hours, light, self.prey)
         return depth_arr[idx], best_growth, best_consumption
 
-    def plot_growth():
+    def plot_growth(self):
         depth_arr = arange(min(depths), max(depths), 0.1)
         gs_d = [growth_fn(d, self.out['StartingLength'][0], self.out['StartingMass'][0], day_hours, DayLight, self.prey)
                 for d in depth_arr]

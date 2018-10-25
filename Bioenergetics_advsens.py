@@ -154,7 +154,8 @@ def sensitivity_expand(form):
     return sparam_exp
 
 def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site, ax2, ax3):
-    print(sens_factors)
+    #print("Sparam: ", sparam, "<br> light: ", site_data.light, "<br> mass: ", starting_mass,
+    #      "<br> total daph: ", daph_data.total_daph, "<br> daph_size: ", daph_data.daph_size, "<br>")
     batches = []
     results = []
     sens_inputs = []
@@ -169,7 +170,8 @@ def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, m
                      'Day Depth': [], 'Day Temperature': [], 'Night Depth': [],
                      'Night Temperature': [], 'Day 1 Growth': [], 'Day 30 Growth': [],
                      'Daphnia Consumed': [], 'Sustainable Estimate': [],
-                     'Estimated Condition Change': [], 'Day P': [], 'Night P': []}
+                     'Estimated Condition Change': [], 'Day P': [], 'Night P': [], 'Sensitivity Parameter': [],
+                     'Base Sensitivity Value': [], 'Sensitivity Input Value': []}
     if sparam == 'Starting Mass':
         base_input = starting_mass
     elif sparam == 'Total Daphnia':
@@ -178,13 +180,11 @@ def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, m
         base_input = daph_data.daph_size
     else:
         base_input = site_data.light
-
     for i in range(15):
         if (base_input * sens_factors[i]) > 0.0001:
             sens_inputs.append(base_input * sens_factors[i])
         else:
             sens_inputs.append(.00001)
-        print(sens_inputs)
         sens_factors[i] = sens_factors[i] * 100
         csvheaders[i] = [site_data.site, site_data.month, site_data.year, ("%s: %f" % (sparam, sens_inputs[i]))]
         if sparam == 'Starting Mass':
@@ -196,6 +196,7 @@ def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, m
             daph_data.daph_size = sens_inputs[i]
             batches.append(Batch(site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site, True))
         else:
+            print("Sens_inputs: ", sens_inputs[i], "<br>")
             site_data.light = sens_inputs[i]
             batches.append(Batch(site_data, starting_mass, daph_data, max_temp, min_temp, cust_temp, elev, pop_site, True))
 
@@ -240,8 +241,20 @@ def run_sensitivity(sens_factors, sparam, site_data, starting_mass, daph_data, m
         SHORT_RESULTS['Estimated Condition Change'].append(condition)
         SHORT_RESULTS['Day P'].append(day_p)
         SHORT_RESULTS['Night P'].append(night_p)
+        SHORT_RESULTS['Sensitivity Parameter'].append(sparam)
+        SHORT_RESULTS['Base Sensitivity Value'].append(base_input)
+        SHORT_RESULTS['Sensitivity Input Value'].append(sens_inputs[i])
         growths.append(results[i]['growth'][29])
         growths1.append(results[i]['growth'][0])
+
+    if sparam == 'Starting Mass':
+        starting_mass = base_input
+    elif sparam == 'Total Daphnia':
+        daph_data.total_daph = base_input
+    elif sparam == 'Daphnia Size':
+        daph_data.daph_size = base_input
+    else:
+        site_data.light = base_input
 
     return results, growths, growths1, csvheaders, sens_inputs, SHORT_RESULTS, ax2, ax3
 
@@ -416,6 +429,7 @@ class Batch:
 
         self.temp_max = self.temp_max or 1000
         self.temp_min = self.temp_min or -1
+
         f = 'ChinookAppendixA.csv'
         with open(f) as fid:
             reader = DictReader(fid, quoting=QUOTE_NONNUMERIC)
@@ -511,7 +525,7 @@ class Batch:
         EncounterRate = searchvolume * daphnia * 60 * 60
     # Capping ER based on 2017 Haskell et al.
     # Haskell equation is in L, daphnia are currently per cc and was per min, convert to hr
-    # Haskell may underestimate maximum, note the high density corresponds to a pt ~48 that is not represented by the 29.858 cap
+    # Haskell likely underestimates maximum, note the high density corresponds to a pt ~48 that is not represented by the 29.858 cap
         max_er = (29.858 * (daphnia * 1000) * ((4.271 + daphnia * 1000) ** (-1)) * 60)
     #    max_er = (48 * (daphnia * 1000) * ((4.271 + daphnia * 1000) ** (-1)) * 60)
         if EncounterRate > max_er:
@@ -822,11 +836,11 @@ class Batch:
         day_hours = self.daylength[self.month]
         night_hours = 24 - day_hours
 
-        self.out = {'Year':[], 'Site':[], 'Month':[], 'Light Extinction Coefficient':[],
-                    'Daphnia Size':[], 'Daphnia Density':[],
-                    'Length':[], 'Mass':[], 'growth':[], 'day_depth':[],
+        self.out = {'Year':[], 'Site':[], 'Month':[], 'Fish Starting Mass':[],
+                    'Light Extinction Coefficient':[], 'Daphnia Size':[], 'Daphnia Density':[],
+                    'StartingLength':[], 'StartingMass':[], 'growth':[], 'day_depth':[],
                     'night_depth':[], 'egestion': [], 'excretion': [], 'consumption': [],
-                    'P': [], 'temps': [], 'Day P': [], 'Night P': []}
+                    'P': [], 'temps': []}
         condition1 = float(100*self.starting_mass*((self.StartingLength/10)**(-3.0)))
         last_best_depths = None
         for d in range(ndays):
@@ -867,14 +881,15 @@ class Batch:
             self.out['Year'].append(self.year)
             self.out['Site'].append(self.site)
             self.out['Month'].append(self.month)
+            self.out['Fish Starting Mass'].append(self.starting_mass)
             self.out['Light Extinction Coefficient'].append(self.light)
             self.out['Daphnia Size'].append(self.daphnia_size)
             self.out['Daphnia Density'].append(self.total_daphnia)
             self.out['day_depth'].append(day_depth)
             self.out['night_depth'].append(night_depth)
             self.out['growth'].append(growth)
-            self.out['Mass'].append(self.starting_mass)
-            self.out['Length'].append(self.StartingLength)
+            self.out['StartingMass'].append(self.starting_mass)
+            self.out['StartingLength'].append(self.StartingLength)
             self.out['egestion'].append(egestion)
             self.out['excretion'].append(excretion)
             self.out['consumption'].append(consumption)
@@ -883,8 +898,6 @@ class Batch:
             ntfinal = self.night_temp
             self.out['temps'].append(dtfinal)
             self.out['temps'].append(ntfinal)
-            self.out['Day P'].append(day_P)
-            self.out['Night P'].append(night_P)
 
         ele = self.elevation-int(day_depth)
         daph = self.daphline(day_depth)

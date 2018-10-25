@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
+
 import os, time
 import matplotlib
 matplotlib.use('Agg')
 import sys
 import csv
-from Bioenergetics2 import *
+from Bioenergetics_Mult import *
 import cgi, cgitb
 import pylab
 import io
@@ -18,7 +19,7 @@ from collections import defaultdict
 from scipy.interpolate import griddata
 import pandas
 cgitb.enable()
-Scruffy()
+#Scruffy()
 form = cgi.FieldStorage()
 StartingMass = 40
 sys.stderr = sys.stdout
@@ -54,7 +55,6 @@ MonthInts = {'March':1, 'April':2, 'May':3, 'June':4, 'July':5, 'August':6 }
 Months = {1:'March',2:'April',3:'May',4:'June',5:'July',6:'August'}
 Mon = MonthInts[Month]
 Mon2 = MonthInts[Month2]
-fig = pyplot.figure()
 fig=pyplot.figure(facecolor='#c8e9b1')
 fig.suptitle('Juvenile Spring Chinook', fontsize=20)
 massax = fig.add_subplot(221)
@@ -62,7 +62,7 @@ Mass = StartingMass
 try:
     for i in range(Mon, (Mon2+1)):
         Light,Total_Daphnia,DaphSize = GetVals(Light,Total_Daphnia,DaphSize,Site,Months[i],Year)
-        batches.append(Batch(Site, Months[i], Year, Light, DaphSize, Total_Daphnia, Mass, 1000, -1, 1000,-1,"None_smoothed_None_None.csv",None,None,None))
+        batches.append(Batch(Site, Months[i], Year, Light, DaphSize, Total_Daphnia, Mass, 1000, -1, 1000,-1,"None_T_None_None.csv",None,None,None))
         dd,nd,g,mass,length = (batches[z].Run_Batch())
         Mass = mass[29]
         for x in g:
@@ -75,22 +75,23 @@ try:
             nds.append(x)
         Light,Total_Daphnia,DaphSize = (None,None,None)
         z = z+1
-except:    
-    print ('Content-Type: text/html')
-    print ('Location: http://cas-web0.biossys.oregonstate.edu/error.html')
-    print ('<html>')
-    print ('<head>')
-    print ('<meta http-equiv="refresh" content="0;url=http://cas-web0.biossys.oregonstate.edu/error.html" />')
-    print ('<title>You are going to be redirected</title>')
-    print ('</head>') 
-    print ('<body>')
-    print ('Redirecting... <a href="http://cas-web0.biossys.oregonstate.edu/error.html">Click here if you are not redirected</a>')
-    print ('</body>')
-    print ('</html>')
-    gitb.handler()
+except:
+    print('Content-Type: text/html')
+    print('Location: http://growchinook.fw.oregonstate.edu/error.html')
+    print('<html>')
+    print('<head>')
+    print('<meta http-equiv="refresh" '
+          'content="0;url=http://growchinook.fw.oregonstate.edu/error.html" />')
+    print('<title>You are going to be redirected</title>')
+    print('</head>')
+    print('<body>')
+    print('Wait <a href="http://growchinook.fw.oregonstate.edu/error.html">'
+          'Click here if you are not redirected</a>')
+    print('</body>')
+    print('</html>')
 
 	
-print ('Content-type:text/html\r\n\r\n')
+print('Content-type:text/html\r\n\r\n')
 print('<html>')
 print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
 <link type="text/css" rel="stylesheet" media="screen" href="/css/Style.css" />
@@ -102,17 +103,17 @@ print('''<link type="text/css" rel="stylesheet" media="screen" href="/css/Style.
 </head>
 <body>
     <ul>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Home</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/">Instructions</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/Test.py">Run Standard Model</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
-        <li><a class="current" href="http://cas-web0.biossys.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
-        <li><a href="http://cas-web0.biossys.oregonstate.edu/about.html">About</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/">Home</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/">Instructions</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/Test.py">Run Standard Model</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/TestSens.py">Run Model With Sensitivity</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/TestSens2.py">Run Advanced Sensitivity</a></li>
+        <li><a class="current" href="http://growchinook.fw.oregonstate.edu/TestSumm.py">Run Multiple Months</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/Curves.html">Temperature and Daphnia Curves</a></li>
+        <li><a href="http://growchinook.fw.oregonstate.edu/about.html">About</a></li>
         
     </ul>''')
-#        <li><a href="http://cas-web0.biossys.oregonstate.edu/scene.py">Run Scenarios</a><li>
+#        <li><a href="http://growchinook.fw.oregonstate.edu/scene.py">Run Scenarios</a><li>
 
 massax.plot(masses, label="Mass (g)")
 massax.set_ylabel('Mass (g)')
